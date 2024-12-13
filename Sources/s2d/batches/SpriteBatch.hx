@@ -6,7 +6,7 @@ import kha.arrays.Uint32Array;
 import kha.arrays.Float32Array;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
-// sui
+// s2d
 import sui.core.graphics.DeferredRenderer;
 import s2d.graphics.MapBatch;
 import s2d.objects.Sprite;

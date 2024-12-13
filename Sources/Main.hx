@@ -39,7 +39,7 @@ class App extends sui.App {
 			sprite.blendMode = AlphaClip;
 			sprite.vertices = [{x: -1, y: -1}, {x: -1, y: 0}, {x: 0, y: 0}, {x: 0, y: -1}];
 
-			sprite.albedoMap = Assets.images.get('albedo');
+			sprite.diffuseMap = Assets.images.get('diffuse');
 			sprite.normalMap = Assets.images.get('normal');
 			sprite.ormMap = Assets.images.get('orm');
 			sprite.emissionColor = Color.fromFloats(0.025, 0.025, 0.025);

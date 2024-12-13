@@ -8,7 +8,7 @@ import kha.Canvas;
 import kha.arrays.Float32Array;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.IndexBuffer;
-// sui
+// s2d
 import s2d.graphics.BlendMode;
 import s2d.batches.SpriteBatch;
 import s2d.graphics.MapPack;

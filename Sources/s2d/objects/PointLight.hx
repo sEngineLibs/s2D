@@ -4,8 +4,8 @@ import kha.Canvas;
 import kha.math.FastVector3;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
-// sui
-import sui.core.graphics.SUIShaders;
+// s2d
+import s2d.graphics.shaders.Shaders;
 
 @:structInit
 class PointLight extends Light {

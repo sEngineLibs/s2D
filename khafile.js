@@ -11,13 +11,6 @@ project.addDefine("S2D_DEBUG_FPS");
 // TODO:
 // project.addDefine('S2D_DEBUG_BOUNDS');
 
-// -> SUI S2D Compiler Flags
-// --> Debugging
-// project.addDefine('S2D_DEBUG_CONSOLE');
-// project.addDefine('S2D_DEBUG_GBUFFER');
-// project.addDefine('S2D_DEBUG_LIGHTS');
-// project.addDefine('S2D_DEBUG_COLLISIONS');
-
 // --> Shading
 project.addDefine("S2D_SHADING_DEFERRED");
 // project.addDefine('S2D_SHADING_FORWARD');

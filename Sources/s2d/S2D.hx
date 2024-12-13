@@ -6,7 +6,7 @@ import kha.Canvas;
 import kha.FastFloat;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
-// sui
+// s2d
 import s2d.graphics.MapPack;
 import s2d.objects.Object;
 import s2d.objects.Sprite;

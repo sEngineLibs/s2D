@@ -4,7 +4,7 @@ import kha.Image;
 import kha.Color;
 import kha.FastFloat;
 import kha.math.FastVector3;
-// sui
+// s2d
 import s2d.objects.Object;
 
 @:structInit

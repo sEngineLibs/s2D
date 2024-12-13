@@ -5,7 +5,7 @@ import kha.Color;
 import kha.Canvas;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
-// sui
+// s2d
 import s2d.graphics.shaders.PBRShader;
 
 class PBRMaterial implements Material {
@@ -13,11 +13,11 @@ class PBRMaterial implements Material {
 	@readonly var batch:PBRMaterialBatch;
 	@readonly var instanceID:Int;
 
-	public var albedoMap(get, set):Image;
+	public var diffuseMap(get, set):Image;
 	public var emissionMap(get, set):Image;
 	public var normalMap(get, set):Image;
 	public var ormMap(get, set):Image;
-	@:isVar public var albedoColor(default, set):Color;
+	@:isVar public var diffuseColor(default, set):Color;
 	@:isVar public var emissionColor(default, set):Color;
 	@:isVar public var normalColor(default, set):Color;
 	@:isVar public var ormColor(default, set):Color;
@@ -32,7 +32,7 @@ class PBRMaterial implements Material {
 		return value;
 	}
 
-	inline function set_albedoMap(value:Image):Image {
+	inline function set_diffuseMap(value:Image):Image {
 		batch.setMapInstance(0, instanceID, value);
 		return value;
 	}
@@ -52,8 +52,8 @@ class PBRMaterial implements Material {
 		return value;
 	}
 
-	function set_albedoColor(value:Color):Color {
-		albedoColor = value;
+	function set_diffuseColor(value:Color):Color {
+		diffuseColor = value;
 		batch.setMapInstanceColor(0, instanceID, value);
 		return value;
 	}
@@ -76,11 +76,11 @@ class PBRMaterial implements Material {
 		return value;
 	}
 	#else
-	public var albedoMap:Image;
+	public var diffuseMap:Image;
 	public var emissionMap:Image;
 	public var normalMap:Image;
 	public var ormMap:Image;
-	@:isVar public var albedoColor(default, set):Color;
+	@:isVar public var diffuseColor(default, set):Color;
 	@:isVar public var emissionColor(default, set):Color;
 	@:isVar public var normalColor(default, set):Color;
 	@:isVar public var ormColor(default, set):Color;
@@ -91,9 +91,9 @@ class PBRMaterial implements Material {
 		map.g2.end();
 	}
 
-	function set_albedoColor(value:Color):Color {
-		albedoColor = value;
-		setMapColor(albedoMap, value);
+	function set_diffuseColor(value:Color):Color {
+		diffuseColor = value;
+		setMapColor(diffuseMap, value);
 		return value;
 	}
 
@@ -117,7 +117,7 @@ class PBRMaterial implements Material {
 
 	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, lights:Array<Light>) {
 		for (light in lights)
-			PBRShader.lighting.draw(target, vertices, indices, albedoMap, emissionMap, normalMap, ormMap, light.x, light.y, light.z, light.color.R,
+			PBRShader.lighting.draw(target, vertices, indices, diffuseMap, emissionMap, normalMap, ormMap, light.x, light.y, light.z, light.color.R,
 				light.color.G, light.color.B, light.power, light.radius);
 	};
 	}
