@@ -23,7 +23,7 @@ class RenderPathDeffered implements RenderPath {
 		#end
 	}
 
-	inline function render(target:Canvas) {
+	inline function draw(target:Canvas) {
 		#if (S2D_SHADING_DEFERRED || S2D_SHADING_MIXED)
 		gbuffer[0].g4.begin([gbuffer[1], gbuffer[2], gbuffer[3]]);
 		gbuffer[0].g4.clear(Color.Transparent, 0.0);

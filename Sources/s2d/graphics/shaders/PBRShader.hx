@@ -1,6 +1,15 @@
 package s2d.graphics.shaders;
 
-import sui.core.graphics.shaders.Shader;
+import kha.Canvas;
+import kha.graphics4.VertexData;
+import kha.graphics4.TextureUnit;
+import kha.graphics4.VertexShader;
+import kha.graphics4.PipelineState;
+import kha.graphics4.FragmentShader;
+import kha.graphics4.VertexStructure;
+import kha.graphics4.ConstantLocation;
+// score
+import score.graphics.Shader;
 
 class PBRShader extends Shader {
 	var diffuseTU:TextureUnit;

@@ -6,6 +6,8 @@ import kha.math.FastVector2;
 @:structInit
 @:autoBuild(sui.core.macro.SUIMacro.build())
 class Object {
+	var stage:S2D = null;
+
 	@:isVar public var x(default, set):FastFloat = 0.0;
 	@:isVar public var y(default, set):FastFloat = 0.0;
 	@:isVar public var z(default, set):FastFloat = 0.0;
@@ -16,6 +18,8 @@ class Object {
 	public inline function new(?stage:S2D) {
 		if (stage != null)
 			stage.add(this);
+
+		this.stage = stage;
 	}
 
 	function set_x(value:FastFloat):FastFloat {

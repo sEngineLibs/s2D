@@ -7,5 +7,5 @@ interface RenderPath {
 	private var stage:S2D;
 
 	private function resize(width:Int, height:Int):Void;
-	private function render(target:Canvas):Void;
+	private function draw(target:Canvas):Void;
 }
