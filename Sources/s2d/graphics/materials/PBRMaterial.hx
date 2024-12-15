@@ -3,11 +3,11 @@ package s2d.graphics.materials;
 import kha.Image;
 import kha.Color;
 import kha.Canvas;
+import kha.math.FastVector2;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 // s2d
-import s2d.objects.Light;
-import s2d.graphics.shaders.PBRShader;
+import s2d.graphics.shaders.S2DShaders;
 
 class PBRMaterial implements Material {
 	public var diffuseMap:Image;
@@ -18,7 +18,12 @@ class PBRMaterial implements Material {
 	@:isVar public var emissionColor(default, set):Color;
 	@:isVar public var normalColor(default, set):Color;
 	@:isVar public var ormColor(default, set):Color;
+
+	// meterial settings
 	public var blendMode:BlendMode;
+	public var shadowCast:Bool;
+	public var shadowMode:BlendMode;
+	public var shadowVerts:Array<FastVector2>;
 
 	inline function setMapColor(map:Image, color:Color) {
 		map.g2.begin(true, color);
@@ -49,7 +54,9 @@ class PBRMaterial implements Material {
 		return value;
 	}
 
-	public function draw(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, lights:Array<Light>) {
-		PBRShader.draw(target, vertices, indices, [diffuseMap, emissionMap, normalMap, ormMap, lights]);
+	public function draw(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, ?uniforms:Array<Dynamic>) {
+		var lights = cast uniforms;
+
+		S2DShaders.pbr.draw(target, vertices, indices, [diffuseMap, emissionMap, normalMap, ormMap, lights]);
 	};
 }
