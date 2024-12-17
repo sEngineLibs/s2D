@@ -8,9 +8,9 @@ import kha.math.FastVector2;
 class Object {
 	var stage:S2D = null;
 
-	@:isVar public var x(default, set):FastFloat = 0.0;
-	@:isVar public var y(default, set):FastFloat = 0.0;
-	@:isVar public var z(default, set):FastFloat = 0.0;
+	@observable @:isVar public var x(default, set):FastFloat = 0.0;
+	@observable @:isVar public var y(default, set):FastFloat = 0.0;
+	@observable @:isVar public var z(default, set):FastFloat = 0.0;
 	public var origin:FastVector2 = {};
 	public var parent:Object = null;
 	public var children:Array<Object> = [];
@@ -48,14 +48,14 @@ class Object {
 			c.rotate(angle);
 	}
 
-	public function scale(x:FastFloat, y:FastFloat) {
+	public function scale(x:FastFloat, y:FastFloat, ?z:FastFloat = 1) {
 		for (c in children)
-			c.scale(x, y);
+			c.scale(x, y, z);
 	}
 
-	public function translate(x:FastFloat, y:FastFloat) {
+	public function translate(x:FastFloat, y:FastFloat, ?z:FastFloat = 0) {
 		for (c in children)
-			c.translate(x, y);
+			c.translate(x, y, z);
 	}
 
 	public function addChild(child:Object) {

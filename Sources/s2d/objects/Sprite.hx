@@ -53,12 +53,12 @@ class Sprite extends Object {
 		model = model.multmat(FastMatrix4.rotationZ(angle));
 	}
 
-	override inline function scale(x:FastFloat, y:FastFloat) {
-		model = model.multmat(FastMatrix4.scale(x, y, 1));
+	override inline function scale(x:FastFloat, y:FastFloat, ?z:FastFloat = 1) {
+		model = model.multmat(FastMatrix4.scale(x, y, z));
 	}
 
-	override inline function translate(x:FastFloat, y:FastFloat) {
-		model = model.multmat(FastMatrix4.translation(x, y, 0));
+	override inline function translate(x:FastFloat, y:FastFloat, ?z:FastFloat = 0) {
+		model = model.multmat(FastMatrix4.translation(x, y, z));
 	}
 
 	public inline function render(target:Canvas) {
