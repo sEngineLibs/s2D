@@ -1,6 +1,4 @@
-let project = new Project("SUI");
-project.addAssets("Assets/**");
+let project = new Project("s2D");
 project.addShaders("Shaders/**");
 project.addSources("Sources");
-project.addParameter("-dce full");
 resolve(project);

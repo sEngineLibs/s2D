@@ -12,5 +12,5 @@ interface Material {
 	public var shadowMode:BlendMode;
 	public var shadowVerts:Array<FastVector2>;
 
-	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, model:FastMatrix4):Void;
+	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, transformation:FastMatrix4):Void;
 }

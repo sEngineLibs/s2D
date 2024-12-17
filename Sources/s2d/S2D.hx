@@ -8,6 +8,8 @@ import kha.math.FastMatrix4;
 import s2d.objects.Object;
 import s2d.objects.Sprite;
 import s2d.objects.Light;
+import s2d.geometry.TransformationMatrix;
+import s2d.geometry.OrthogonalProjection;
 
 using score.utils.ArrayExt;
 
@@ -15,7 +17,7 @@ using score.utils.ArrayExt;
 class S2D {
 	@readonly public var lights:Array<Light> = [];
 	@readonly public var sprites:Array<Sprite> = [];
-	@readonly public var projection:OrthogonalProjection = FastMatrix4.orthogonalProjection(-1, 1, -1, 1, 0, 1);
+	@readonly public var projection:OrthogonalProjection = TransformationMatrix.Identity;
 
 	public function new() {}
 
@@ -51,32 +53,5 @@ class S2D {
 		#if S2D_SHOW_GRID
 		showGrid(target);
 		#end
-	}
-}
-
-@:structInit
-@:build(score.macro.SMacro.build())
-private abstract OrthogonalProjection(FastMatrix4) from FastMatrix4 to FastMatrix4 {
-	public inline function rotate(angle:FastFloat):Void {
-		this = this.multmat(FastMatrix4.rotationZ(angle));
-	}
-
-	public inline function scale(x:FastFloat, y:FastFloat, ?z:FastFloat = 1):Void {
-		this = this.multmat(FastMatrix4.scale(x, y, z));
-	}
-
-	public inline function translate(x:FastFloat, y:FastFloat, ?z:FastFloat = 0):Void {
-		this = this.multmat(FastMatrix4.translation(x, y, z));
-	}
-
-	public inline function setAspectRatio(value:FastFloat) {
-		if (value >= 1)
-			scale(1 / this._00 / value, 1, 1);
-		else
-			scale(1, value / this._11, 1);
-	}
-
-	public inline function multmat(value:FastMatrix4) {
-		return this.multmat(value);
 	}
 }

@@ -63,9 +63,9 @@ class PBRMaterial implements Material {
 		return value;
 	}
 
-	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, model:FastMatrix4) {
+	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, transformation:FastMatrix4) {
 		S2DShaders.pbr.render(target, vertices, indices, [
-			SEngine.stage.projection.multmat(model), // mvp
+			SEngine.stage.projection.transformation.matrix.multmat(transformation), // mvp
 			diffuseMap,
 			emissionMap,
 			normalMap,

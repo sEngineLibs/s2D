@@ -9,12 +9,14 @@ import kha.graphics4.VertexStructure;
 // s2d
 import s2d.graphics.materials.Material;
 import s2d.graphics.materials.PBRMaterial;
+import s2d.geometry.TransformationMatrix;
 
 @:structInit
 class Sprite extends Object {
 	var vertices:VertexBuffer;
 	var indices:IndexBuffer;
-	var model:FastMatrix4 = FastMatrix4.identity();
+
+	@readonly public var transformation:TransformationMatrix = FastMatrix4.identity();
 
 	public var material:Material = new PBRMaterial();
 
@@ -50,18 +52,18 @@ class Sprite extends Object {
 	}
 
 	override inline function rotate(angle:FastFloat) {
-		model = model.multmat(FastMatrix4.rotationZ(angle));
+		transformation = transformation.matrix.multmat(FastMatrix4.rotationZ(angle));
 	}
 
 	override inline function scale(x:FastFloat, y:FastFloat, ?z:FastFloat = 1) {
-		model = model.multmat(FastMatrix4.scale(x, y, z));
+		transformation = transformation.matrix.multmat(FastMatrix4.scale(x, y, z));
 	}
 
 	override inline function translate(x:FastFloat, y:FastFloat, ?z:FastFloat = 0) {
-		model = model.multmat(FastMatrix4.translation(x, y, z));
+		transformation = transformation.matrix.multmat(FastMatrix4.translation(x, y, z));
 	}
 
 	public inline function render(target:Canvas) {
-		material.render(target, vertices, indices, model);
+		material.render(target, vertices, indices, transformation);
 	}
 }
