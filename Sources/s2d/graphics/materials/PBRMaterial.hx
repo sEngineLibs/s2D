@@ -1,5 +1,7 @@
 package s2d.graphics.materials;
 
+import kha.math.FastMatrix4;
+import sengine.SEngine;
 import kha.Image;
 import kha.Color;
 import kha.Canvas;
@@ -10,14 +12,21 @@ import kha.graphics4.VertexBuffer;
 import s2d.graphics.shaders.S2DShaders;
 
 class PBRMaterial implements Material {
-	public var diffuseMap:Image;
-	public var emissionMap:Image;
-	public var normalMap:Image;
-	public var ormMap:Image;
+	public var diffuseMap:Image = Image.createRenderTarget(1, 1, RGBA32, NoDepthAndStencil);
+	public var emissionMap:Image = Image.createRenderTarget(1, 1, RGBA32, NoDepthAndStencil);
+	public var normalMap:Image = Image.createRenderTarget(1, 1, RGBA32, NoDepthAndStencil);
+	public var ormMap:Image = Image.createRenderTarget(1, 1, RGBA32, NoDepthAndStencil);
 	@:isVar public var diffuseColor(default, set):Color;
 	@:isVar public var emissionColor(default, set):Color;
 	@:isVar public var normalColor(default, set):Color;
 	@:isVar public var ormColor(default, set):Color;
+
+	public inline function new() {
+		diffuseColor = Color.fromFloats(0.85, 0.85, 0.85);
+		emissionColor = Color.fromFloats(0.0, 0.0, 0.0);
+		normalColor = Color.fromFloats(0.5, 0.5, 1.0);
+		ormColor = Color.fromFloats(1.0, 0.5, 0.0);
+	}
 
 	// meterial settings
 	public var blendMode:BlendMode;
@@ -54,9 +63,14 @@ class PBRMaterial implements Material {
 		return value;
 	}
 
-	public function draw(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, ?uniforms:Array<Dynamic>) {
-		var lights = cast uniforms;
-
-		S2DShaders.pbr.draw(target, vertices, indices, [diffuseMap, emissionMap, normalMap, ormMap, lights]);
+	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, model:FastMatrix4) {
+		S2DShaders.pbr.render(target, vertices, indices, [
+			SEngine.stage.projection.multmat(model), // mvp
+			diffuseMap,
+			emissionMap,
+			normalMap,
+			ormMap,
+			SEngine.stage.lights
+		]);
 	};
 }

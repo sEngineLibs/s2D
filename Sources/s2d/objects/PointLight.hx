@@ -4,8 +4,6 @@ import kha.Canvas;
 import kha.math.FastVector3;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
-// s2d
-import s2d.graphics.shaders.Shaders;
 
 @:structInit
 class PointLight extends Light {
@@ -76,6 +74,6 @@ class PointLight extends Light {
 			ind[i] = indData[i];
 		indices.unlock();
 
-		SUIShaders.shadowCaster.draw(target, vertices, indices);
+		// SUIShaders.shadowCaster.render(target, vertices, indices);
 	}
 }

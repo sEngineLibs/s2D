@@ -1,5 +1,6 @@
 package s2d.graphics.shaders;
 
+import s2d.objects.Light;
 import kha.Canvas;
 import kha.graphics4.VertexData;
 import kha.graphics4.TextureUnit;
@@ -12,11 +13,11 @@ import kha.graphics4.ConstantLocation;
 import score.graphics.Shader;
 
 class PBRShader extends Shader {
+	var mvpCL:ConstantLocation;
 	var diffuseTU:TextureUnit;
 	var emissionTU:TextureUnit;
 	var normalTU:TextureUnit;
 	var ormTU:TextureUnit;
-
 	var lightPosCL:ConstantLocation;
 	var lightColorCL:ConstantLocation;
 	var lightAttribCL:ConstantLocation;
@@ -40,6 +41,7 @@ class PBRShader extends Shader {
 	}
 
 	override inline function getUniforms() {
+		mvpCL = pipeline.getConstantLocation("MVP");
 		ormTU = pipeline.getTextureUnit("ormMap");
 		normalTU = pipeline.getTextureUnit("normalMap");
 		diffuseTU = pipeline.getTextureUnit("diffuseMap");
@@ -51,12 +53,15 @@ class PBRShader extends Shader {
 	}
 
 	override inline function setUniforms(target:Canvas, ?uniforms:Dynamic) {
-		target.g4.setTexture(diffuseTU, uniforms[0]);
-		target.g4.setTexture(emissionTU, uniforms[1]);
-		target.g4.setTexture(normalTU, uniforms[2]);
-		target.g4.setTexture(ormTU, uniforms[3]);
-		target.g4.setFloat3(lightPosCL, uniforms[4], uniforms[5], uniforms[6]);
-		target.g4.setFloat3(lightColorCL, uniforms[7], uniforms[8], uniforms[9]);
-		target.g4.setFloat2(lightAttribCL, uniforms[10], uniforms[11]);
+		target.g4.setMatrix(mvpCL, uniforms[0]);
+		target.g4.setTexture(diffuseTU, uniforms[1]);
+		target.g4.setTexture(emissionTU, uniforms[2]);
+		target.g4.setTexture(normalTU, uniforms[3]);
+		target.g4.setTexture(ormTU, uniforms[4]);
+
+		var lights:Array<Light> = cast uniforms[5];
+		target.g4.setFloat3(lightPosCL, lights[0].x, lights[0].y, lights[0].z);
+		target.g4.setFloat3(lightColorCL, lights[0].color.R, lights[0].color.G, lights[0].color.B);
+		target.g4.setFloat2(lightAttribCL, lights[0].power, lights[0].radius);
 	}
 }

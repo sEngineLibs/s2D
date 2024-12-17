@@ -4,7 +4,7 @@ import kha.FastFloat;
 import kha.math.FastVector2;
 
 @:structInit
-@:autoBuild(sui.core.macro.SUIMacro.build())
+@:autoBuild(score.macro.SMacro.build())
 class Object {
 	var stage:S2D = null;
 
