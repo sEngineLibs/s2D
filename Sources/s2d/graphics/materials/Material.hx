@@ -6,11 +6,13 @@ import kha.math.FastMatrix4;
 import kha.graphics4.IndexBuffer;
 import kha.graphics4.VertexBuffer;
 
-interface Material {
+class Material {
 	public var blendMode:BlendMode;
 	public var shadowCast:Bool;
 	public var shadowMode:BlendMode;
 	public var shadowVerts:Array<FastVector2>;
 
-	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, transformation:FastMatrix4):Void;
+	public function new() {}
+
+	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, transformation:FastMatrix4):Void {};
 }

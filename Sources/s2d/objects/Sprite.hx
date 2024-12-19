@@ -8,7 +8,6 @@ import kha.graphics4.VertexBuffer;
 import kha.graphics4.VertexStructure;
 // s2d
 import s2d.graphics.materials.Material;
-import s2d.graphics.materials.PBRMaterial;
 import s2d.geometry.TransformationMatrix;
 
 @:structInit
@@ -18,7 +17,7 @@ class Sprite extends Object {
 
 	@readonly public var transformation:TransformationMatrix = FastMatrix4.identity();
 
-	public var material:Material = new PBRMaterial();
+	public var material:Material = new Material();
 
 	public inline function new(stage:S2D) {
 		super(stage);
