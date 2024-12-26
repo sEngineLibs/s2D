@@ -1,88 +1,56 @@
 package s2d.objects;
 
 import kha.FastFloat;
-import kha.math.FastVector2;
+import kha.math.FastMatrix4;
+// s2d
+import s2d.geometry.Transformation;
 
-@:structInit
-@:autoBuild(score.macro.SMacro.build())
 class Object {
-	var stage:S2D = null;
+	@:isVar public var parent(default, null):Object = null;
+	@:isVar public var children(default, null):Array<Object> = [];
+	public var x:FastFloat = 0.0;
+	public var y:FastFloat = 0.0;
+	public var z:FastFloat = 0.0;
+	public var transformation:Transformation = FastMatrix4.identity();
+	public var finalTransformation(get, never):Transformation;
 
-	@observable @:isVar public var x(default, set):FastFloat = 0.0;
-	@observable @:isVar public var y(default, set):FastFloat = 0.0;
-	@observable @:isVar public var z(default, set):FastFloat = 0.0;
-	public var origin:FastVector2 = {};
-	public var parent:Object = null;
-	public var children:Array<Object> = [];
+	public inline function new() {}
 
-	public inline function new(?stage:S2D) {
-		if (stage != null)
-			stage.add(this);
+	public inline function setParent(value:Object):Void {
+		if (parent == value)
+			return;
 
-		this.stage = stage;
-	}
+		removeParent();
 
-	function set_x(value:FastFloat):FastFloat {
-		for (c in children)
-			c.x += value - x;
-		x = value;
-		return value;
-	}
-
-	function set_y(value:FastFloat):FastFloat {
-		for (c in children)
-			c.y += value - y;
-		y = value;
-		return value;
-	}
-
-	function set_z(value:FastFloat):FastFloat {
-		for (c in children)
-			c.z += value - z;
-		z = value;
-		return value;
-	}
-
-	public function rotate(angle:FastFloat) {
-		for (c in children)
-			c.rotate(angle);
-	}
-
-	public function scale(x:FastFloat, y:FastFloat, ?z:FastFloat = 1) {
-		for (c in children)
-			c.scale(x, y, z);
-	}
-
-	public function translate(x:FastFloat, y:FastFloat, ?z:FastFloat = 0) {
-		for (c in children)
-			c.translate(x, y, z);
-	}
-
-	public function addChild(child:Object) {
-		children.push(child);
-		child.parent = this;
-	}
-
-	public function removeChild(child:Object) {
-		var index = children.indexOf(child);
-		if (index != -1) {
-			children.splice(index, 1);
-			child.parent = null;
+		if (value != null) {
+			if (!value.children.contains(this))
+				value.addChild(this);
+			parent = value;
 		}
 	}
 
-	public function removeChildren() {
-		for (child in children)
-			child.parent = null;
-
-		children = [];
+	public inline function removeParent():Void {
+		if (parent != null)
+			parent.removeChild(this);
+		parent = null;
 	}
 
-	public function setParent(parent:Object) {
-		parent.addChild(this);
+	public inline function addChild(value:Object):Void {
+		if (value == null || value == this)
+			return;
+
+		if (!children.contains(value)) {
+			children.push(value);
+			value.setParent(this);
+		}
 	}
 
-	public function removeParent() {
-		parent.removeChild(this);
+	public inline function removeChild(value:Object):Void {
+		if (value != null && children.remove(value))
+			value.removeParent();
+	}
+
+	inline function get_finalTransformation():Transformation {
+		return parent == null ? transformation : parent.finalTransformation.multmat(transformation);
 	}
 }

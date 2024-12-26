@@ -1,9 +1,10 @@
 #version 450
 
-uniform vec3 normalCol;
-uniform vec3 diffuseCol;
-uniform vec3 emissionCol;
-uniform vec3 ormCol; // [occlusion, roughness, metalness]
+uniform sampler2D positionMap;
+uniform sampler2D normalMap;
+uniform sampler2D colorMap;
+uniform sampler2D emissionMap;
+uniform sampler2D ormMap; // [occlusion, roughness, metalness]
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -39,12 +40,18 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 }
 
 void main() {
-    vec3 normal = normalize(normalCol * 2 - 1);
-    float occlusion = ormCol.r;
-    float roughness = ormCol.g;
-    float metalness = ormCol.b;
+    vec3 position = texture(positionMap, fragCoord).rgb;
+    vec3 normal = normalize(texture(normalMap, fragCoord).rgb * 2 - 1);
+    vec3 color = texture(colorMap, fragCoord).rgb;
 
-    vec3 l = vec3(lightPos.xy - fragCoord, lightPos.z);
+    vec3 orm = texture(ormMap, fragCoord).rgb;
+    float occlusion = orm.r;
+    float roughness = orm.g;
+    float metalness = orm.b;
+
+    vec3 emission = texture(emissionMap, fragCoord).rgb;
+
+    vec3 l = vec3(lightPos - position);
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
     vec3 dir = l / dist;
@@ -55,7 +62,7 @@ void main() {
     vec3 H = normalize(dir + V);
 
     // Fresnel
-    vec3 F0 = mix(vec3(0.04), mix(vec3(0.16), diffuseCol, metalness), metalness);
+    vec3 F0 = mix(vec3(0.04), mix(vec3(0.16), color, metalness), metalness);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
     // BRDF components
@@ -63,9 +70,9 @@ void main() {
     float G = geometrySmith(normal, V, dir, roughness);
     vec3 specularLight = NDF * G * F / max(4.0 * max(dot(normal, V), 0.0) * max(dot(normal, dir), 0.0), 0.001);
 
-    // diffuse
+    // color
     vec3 kD = (1.0 - F) * (1.0 - metalness);
-    vec3 diffuseLight = kD * diffuseCol * max(dot(normal, dir), 0.0) / PI;
+    vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
 
-    fragColor = vec4(emissionCol + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 1.0);
+    fragColor = vec4(emission + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 1.0);
 }

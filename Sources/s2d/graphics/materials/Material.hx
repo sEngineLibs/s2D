@@ -1,18 +1,7 @@
 package s2d.graphics.materials;
 
-import kha.Canvas;
-import kha.math.FastVector2;
-import kha.math.FastMatrix4;
-import kha.graphics4.IndexBuffer;
-import kha.graphics4.VertexBuffer;
-
 class Material {
-	public var blendMode:BlendMode;
-	public var shadowCast:Bool;
-	public var shadowMode:BlendMode;
-	public var shadowVerts:Array<FastVector2>;
+	public var blendMode:BlendMode = AlphaBlend;
 
-	public function new() {}
-
-	public function render(target:Canvas, vertices:VertexBuffer, indices:IndexBuffer, transformation:FastMatrix4):Void {};
+	public inline function new() {}
 }
