@@ -1,5 +1,6 @@
 #version 450
 
+uniform mat4 model;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
 uniform sampler2D ormMap;
@@ -17,12 +18,18 @@ layout(location = 3) out vec4 orm;
 layout(location = 4) out vec4 emission;
 
 void main() {
-    normal = texture(normalMap, fragUV);
+    vec3 tNormal = texture(normalMap, fragUV).rgb;
+    tNormal.xy = tNormal.xy * 2.0 - 1.0;
     position = vec4(fragPos, 1.0);
-    position.z += (normal.z - 0.5) * depthScale;
+    position.z += (tNormal.z) * depthScale;
     color = texture(colorMap, fragUV);
     orm = texture(ormMap, fragUV);
     emission = texture(emissionMap, fragUV);
+
+    // convert tangent space normals to world space normals
+    normal.x = model[0][0] * tNormal.x + model[1][0] * tNormal.y;
+    normal.y = model[0][1] * tNormal.x + model[1][1] * tNormal.y;
+    normal.z = 1.0;
 
     float mask = 1.0;
     // opaque

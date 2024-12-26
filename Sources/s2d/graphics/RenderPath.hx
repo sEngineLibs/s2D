@@ -9,14 +9,16 @@ import s2d.graphics.shaders.CompositorPass;
 
 class RenderPath {
 	public static inline function render(target:Canvas, stage:Stage):Void {
-		var mvp = S2D.projection.multmat(stage.camera);
+		var VP = S2D.projection.multmat(stage.camera);
 
+		// geometry pass
 		S2D.gbuffer[0].g4.begin([S2D.gbuffer[1], S2D.gbuffer[2], S2D.gbuffer[3], S2D.gbuffer[4]]);
 		S2D.gbuffer[0].g4.clear(Black);
 		S2D.gbuffer[0].g4.setPipeline(GeometryPass.pipeline);
 		S2D.gbuffer[0].g4.setIndexBuffer(Sprite.indices);
 		for (sprite in stage.sprites) {
-			S2D.gbuffer[0].g4.setMatrix(GeometryPass.mvpCL, mvp.multmat(sprite.finalTransformation));
+			S2D.gbuffer[0].g4.setMatrix(GeometryPass.modelCL, sprite.finalTransformation);
+			S2D.gbuffer[0].g4.setMatrix(GeometryPass.vpCL, VP);
 			S2D.gbuffer[0].g4.setInt(GeometryPass.blendModeCL, sprite.material.blendMode);
 			S2D.gbuffer[0].g4.setFloat(GeometryPass.depthScaleCL, sprite.material.depthScale);
 			S2D.gbuffer[0].g4.setTexture(GeometryPass.colorMapTU, sprite.material.colorMap);
@@ -28,10 +30,16 @@ class RenderPath {
 		}
 		S2D.gbuffer[0].g4.end();
 
+		// lighting pass
 		S2D.gbuffer[5].g2.begin();
 		S2D.gbuffer[5].g4.setPipeline(LightingPass.pipeline);
 		S2D.gbuffer[5].g4.setIndexBuffer(S2D.indices);
 		S2D.gbuffer[5].g4.setVertexBuffer(S2D.vertices);
+		var psx = 1 / S2D.projection._00;
+		var psy = 1 / S2D.projection._11;
+		var psz = S2D.distance;
+
+		S2D.gbuffer[5].g4.setFloat3(LightingPass.pCL, psx, psy, psz);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.positionMapTU, S2D.gbuffer[0]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.normalMapTU, S2D.gbuffer[1]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.colorMapTU, S2D.gbuffer[2]);
@@ -45,6 +53,7 @@ class RenderPath {
 		}
 		S2D.gbuffer[5].g2.end();
 
+		// compositor pass
 		target.g2.begin();
 		target.g4.setPipeline(CompositorPass.pipeline);
 		target.g4.setIndexBuffer(S2D.indices);

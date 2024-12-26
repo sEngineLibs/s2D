@@ -9,7 +9,8 @@ import kha.graphics4.ConstantLocation;
 class GeometryPass {
 	public static var pipeline:PipelineState;
 
-	public static var mvpCL:ConstantLocation;
+	public static var modelCL:ConstantLocation;
+	public static var vpCL:ConstantLocation;
 	public static var blendModeCL:ConstantLocation;
 	public static var depthScaleCL:ConstantLocation;
 	public static var colorMapTU:TextureUnit;
@@ -24,8 +25,6 @@ class GeometryPass {
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
-		pipeline.colorAttachmentCount = 5;
-		pipeline.colorAttachments = [RGBA32, RGBA32, RGBA32, RGBA32, RGBA32];
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = SourceAlpha;
@@ -34,7 +33,8 @@ class GeometryPass {
 		pipeline.fragmentShader = Shaders.geometry_pass_frag;
 		pipeline.compile();
 
-		mvpCL = pipeline.getConstantLocation("MVP");
+		modelCL = pipeline.getConstantLocation("model");
+		vpCL = pipeline.getConstantLocation("VP");
 		blendModeCL = pipeline.getConstantLocation("blendMode");
 		depthScaleCL = pipeline.getConstantLocation("depthScale");
 		colorMapTU = pipeline.getTextureUnit("colorMap");

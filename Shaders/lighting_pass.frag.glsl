@@ -1,5 +1,6 @@
 #version 450
 
+uniform vec3 p; // decomposed projection: [scaleX, scaleY, scaleZ]
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
@@ -26,7 +27,7 @@ float distributionGGX(vec3 N, vec3 H, float roughness) {
     float a2 = a * a;
     float NdotH = max(dot(N, H), 0.0);
     float denom = NdotH * (a2 - 1.0) + 1.0;
-    return a2 / (PI * denom * denom);
+    return a2 / (PI * (denom * denom + 1e-4));
 }
 
 float geometrySchlickGGX(float NdotX, float k) {
@@ -41,7 +42,9 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 
 void main() {
     vec3 position = texture(positionMap, fragCoord).rgb;
-    vec3 normal = normalize(texture(normalMap, fragCoord).rgb * 2 - 1);
+    position = (position * 2.0 - 1.0) * p;
+
+    vec3 normal = normalize(texture(normalMap, fragCoord).rgb);
     vec3 color = texture(colorMap, fragCoord).rgb;
 
     vec3 orm = texture(ormMap, fragCoord).rgb;
@@ -51,7 +54,7 @@ void main() {
 
     vec3 emission = texture(emissionMap, fragCoord).rgb;
 
-    vec3 l = vec3(lightPos - position);
+    vec3 l = lightPos - position;
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
     vec3 dir = l / dist;
@@ -62,17 +65,17 @@ void main() {
     vec3 H = normalize(dir + V);
 
     // Fresnel
-    vec3 F0 = mix(vec3(0.04), mix(vec3(0.16), color, metalness), metalness);
+    vec3 F0 = mix(vec3(0.04), color, metalness);
     vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
     // BRDF components
     float NDF = distributionGGX(normal, H, roughness);
     float G = geometrySmith(normal, V, dir, roughness);
-    vec3 specularLight = NDF * G * F / max(4.0 * max(dot(normal, V), 0.0) * max(dot(normal, dir), 0.0), 0.001);
+    vec3 specularLight = NDF * G * F / max(4.0 * max(dot(normal, V), 0.0) * max(dot(normal, dir), 0.0), 1e-4);
 
-    // color
+    // Diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
 
-    fragColor = vec4(emission + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 1.0);
+    fragColor = vec4(clamp(emission + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 0.0, 1.0), 1.0);
 }
