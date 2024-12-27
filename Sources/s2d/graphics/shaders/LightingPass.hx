@@ -9,7 +9,6 @@ import kha.graphics4.ConstantLocation;
 class LightingPass {
 	public static var pipeline:PipelineState;
 
-	public static var pCL:ConstantLocation;
 	public static var positionMapTU:TextureUnit;
 	public static var colorMapTU:TextureUnit;
 	public static var normalMapTU:TextureUnit;
@@ -32,7 +31,6 @@ class LightingPass {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
-		pCL = pipeline.getConstantLocation("p");
 		positionMapTU = pipeline.getTextureUnit("positionMap");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");

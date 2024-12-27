@@ -1,6 +1,5 @@
 #version 450
 
-uniform vec3 p; // decomposed projection: [scaleX, scaleY, scaleZ]
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
@@ -54,7 +53,7 @@ void main() {
 
     vec3 emission = texture(emissionMap, fragCoord).rgb;
 
-    vec3 l = lightPos / p - position;
+    vec3 l = lightPos - position;
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
     vec3 dir = l / dist;

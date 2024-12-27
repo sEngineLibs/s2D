@@ -2,22 +2,56 @@
 
 uniform sampler2D textureMap;
 uniform sampler2D positionMap;
+uniform vec2 resolution;
 uniform vec3 dofAttrib;
+uniform float fisheyePower;
 
 in vec2 fragCoord;
 out vec4 fragColor;
 
-const float Pi2 = 6.28318530718; // Pi * 2
-const float blurQuality = 64.0;
+vec4 DOF(sampler2D t, vec2 UV, float f, int numI, int numJ) {
+    vec4 c = texture(t, UV);
+    float W = 1.0;
+
+    for (int i = 1; i <= numI; ++i) {
+        float r = f * i / numI;
+        float w = exp(-(r * r) * 1.0 / 2.56679); // 2.56679 = (2 * sigma * sigma) / (sigma * sqrt(PI * 2))
+
+        for (int j = 0; j < numJ; ++j) {
+            float a = j * 6.28318530718 / numJ; // 6.28318530718 = PI * 2
+            vec2 o = vec2(cos(a), sin(a)) * r;
+            c += texture(t, UV + o) * w;
+            W += w;
+        }
+    }
+    
+    return c / W;
+}
+
+vec2 fisheye(vec2 p, float power) {
+	float prop = resolution.x / resolution.y;
+
+	vec2 m = vec2(0.5, 0.5 / prop);
+	vec2 d = p - m;
+	float r = sqrt(dot(d, d));
+
+	float bind = sqrt(dot(m, m));
+	if (power <= 0.0)  {
+        if (prop < 1.0) 
+            bind = m.x; 
+        else 
+            bind = m.y;
+    }
+
+	if (power > 0.0) // fisheye
+		return m + normalize(d) * tan(r * power) * bind / tan( bind * power);
+	else if (power < 0.0) // anti-fisheye
+		return m + normalize(d) * atan(r * -power * 10.0) * bind / atan(-power * bind * 10.0);
+}
 
 void main() {
-    vec4 color = texture(textureMap, fragCoord);
-    // float dist = abs(texture(positionMap, fragCoord).z - dofAttrib[0]) * 1 / dofAttrib[1];
+    float dist = abs(texture(positionMap, fragCoord).z - dofAttrib.x) / dofAttrib.y;
+    vec2 UV = fisheye(fragCoord, fisheyePower);
 
-    // for (float d = 0.0; d < Pi2; d += Pi2 / dofAttrib[2]) 
-    //     for (float i = 0.0; i <= 1.0; i += 1.0 / blurQuality) 
-    //         color += texture(textureMap, fragCoord + dist * vec2(cos(d), sin(d)) * i);
-
-    // color /= blurQuality * dofAttrib[2];
-    fragColor = color;
+    fragColor = DOF(textureMap, UV, dist, 8, int(dofAttrib[2])); // 8 = number of iterations
 }

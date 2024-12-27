@@ -8,10 +8,17 @@ private typedef DOF = {
 	var blades:Int;
 }
 
+private typedef Fisheye = {
+	var power:FastFloat;
+}
+
 class Compositor {
 	public static var dof:DOF = {
 		focusDistance: 0.5,
 		fStop: 16.0,
-        blades: 16 
+		blades: 16
+	};
+	public static var fisheye:Fisheye = {
+		power: 0.0
 	};
 }

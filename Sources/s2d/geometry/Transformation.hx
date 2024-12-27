@@ -2,6 +2,8 @@ package s2d.geometry;
 
 import kha.FastFloat;
 import kha.math.FastMatrix4;
+import kha.math.FastVector3;
+import kha.math.FastVector4;
 
 abstract Transformation(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 	public var translationX(get, set):FastFloat;
@@ -17,6 +19,18 @@ abstract Transformation(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 
 	public inline function multmat(value:FastMatrix4) {
 		return this.multmat(value);
+	}
+
+	public inline function multfloat3(x:FastFloat, y:FastFloat, z:FastFloat):FastVector3 {
+		return {
+			x: this._00 * x + this._10 * y + this._20 * z,
+			y: this._01 * x + this._11 * y + this._21 * z,
+			z: this._02 * x + this._12 * y + this._22 * z
+		};
+	}
+
+	public inline function multvec3(value:FastVector3):FastVector3 {
+		return multfloat3(value.x, value.y, value.z);
 	}
 
 	inline function get_translationX():FastFloat {

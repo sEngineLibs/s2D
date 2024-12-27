@@ -11,7 +11,9 @@ class CompositorPass {
 
 	public static var textureMapTU:TextureUnit;
 	public static var positionMapTU:TextureUnit;
+	public static var resolutionCL:ConstantLocation;
 	public static var dofAttribCL:ConstantLocation;
+	public static var fisheyePowerCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -25,6 +27,8 @@ class CompositorPass {
 
 		textureMapTU = pipeline.getTextureUnit("textureMap");
 		positionMapTU = pipeline.getTextureUnit("positionMap");
+		resolutionCL = pipeline.getConstantLocation("resolution");
 		dofAttribCL = pipeline.getConstantLocation("dofAttrib");
+		fisheyePowerCL = pipeline.getConstantLocation("fisheyePower");
 	}
 }
