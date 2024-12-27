@@ -88,6 +88,8 @@ class S2D {
 			projection = FastMatrix4.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale, 0.0, distance);
 		else
 			projection = FastMatrix4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, distance);
+
+		projection.setScaleZ(-1.0);
 	}
 
 	public static inline function local2WorldSpace(point:FastVector3):FastVector3 {
