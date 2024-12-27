@@ -11,12 +11,11 @@ class GeometryPass {
 
 	public static var modelCL:ConstantLocation;
 	public static var vpCL:ConstantLocation;
-	public static var blendModeCL:ConstantLocation;
-	public static var depthScaleCL:ConstantLocation;
 	public static var colorMapTU:TextureUnit;
 	public static var normalMapTU:TextureUnit;
 	public static var ormMapTU:TextureUnit;
-	public static var emissionMapTU:TextureUnit;
+	public static var glowMapTU:TextureUnit;
+	public static var matAttribCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -35,11 +34,10 @@ class GeometryPass {
 
 		modelCL = pipeline.getConstantLocation("model");
 		vpCL = pipeline.getConstantLocation("VP");
-		blendModeCL = pipeline.getConstantLocation("blendMode");
-		depthScaleCL = pipeline.getConstantLocation("depthScale");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
-		emissionMapTU = pipeline.getTextureUnit("emissionMap");
+		glowMapTU = pipeline.getTextureUnit("glowMap");
+		matAttribCL = pipeline.getConstantLocation("matAttrib");
 	}
 }

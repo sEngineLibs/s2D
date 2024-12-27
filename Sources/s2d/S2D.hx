@@ -1,12 +1,12 @@
 package s2d;
 
-import kha.math.FastVector2;
 import kha.Image;
 import kha.System;
 import kha.Assets;
 import kha.Window;
 import kha.FastFloat;
 import kha.Framebuffer;
+import kha.math.FastVector3;
 import kha.math.FastMatrix4;
 import kha.graphics4.VertexBuffer;
 import kha.graphics4.IndexBuffer;
@@ -20,11 +20,13 @@ import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.CompositorPass;
 import s2d.graphics.shaders.PostProcessingPass;
 
+using s2d.utils.FastMatrix4Ext;
+
 class S2D {
-	public static var indices:IndexBuffer;
-	public static var vertices:VertexBuffer;
 	public static var projection:FastMatrix4;
 	public static var gbuffer:Array<Image> = [];
+	public static var WIDTH:Int;
+	public static var HEIGHT:Int;
 	@:isVar public static var scale(default, set):FastFloat = 1.0;
 	@:isVar public static var distance(default, set):FastFloat = 1.0;
 	@:isVar public static var aspectRatio(default, set):FastFloat = 1.0;
@@ -40,33 +42,10 @@ class S2D {
 			PostProcessingPass.compile();
 			Sprite.init();
 
-			// init indices
-			indices = new IndexBuffer(6, StaticUsage);
-			var ind = indices.lock();
-			ind[0] = 0;
-			ind[1] = 1;
-			ind[2] = 2;
-			ind[3] = 3;
-			ind[4] = 2;
-			ind[5] = 0;
-			indices.unlock();
-
-			// init structure
-			var structure = new VertexStructure();
-			structure.add("vertCoord", Float32_2X);
-			var structSize = 2;
-
-			// init vertices
-			vertices = new VertexBuffer(4, structure, StaticUsage);
-			var vert = vertices.lock();
-			for (i in 0...4) {
-				vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
-				vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
-			}
-			vertices.unlock();
-
+			WIDTH = window.width;
+			HEIGHT = window.height;
 			aspectRatio = window.width / window.height;
-			// [position, normal, color, orm, emission, postprocessing, compositing]
+			// [position, normal, color, orm, glow, postprocessing, compositing]
 			for (i in 0...7)
 				gbuffer.push(Image.createRenderTarget(window.width, window.height));
 
@@ -79,6 +58,8 @@ class S2D {
 	}
 
 	public static inline function resize(width:Int, height:Int) {
+		WIDTH = width;
+		HEIGHT = height;
 		aspectRatio = width / height;
 		for (i in 0...gbuffer.length)
 			gbuffer[i] = Image.createRenderTarget(width, height);
@@ -109,11 +90,42 @@ class S2D {
 			projection = FastMatrix4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, distance);
 	}
 
-	public static inline function mapToProjection(point:FastVector2):FastVector2 {
+	public static inline function local2WorldSpace(point:FastVector3):FastVector3 {
 		return {
-			x: (point.x * 2.0 - 1.0) * Math.sqrt(projection._00 * projection._00 + projection._10 * projection._10),
-			y: -(point.y * 2.0 - 1.0) * Math.sqrt(projection._01 * projection._01 + projection._11 * projection._11)
+			x: (point.x * 2.0 - 1.0) / projection.getScaleX(),
+			y: (point.y * 2.0 - 1.0) / projection.getScaleY(),
+			z: (point.z * 2.0 - 1.0) / projection.getScaleZ()
 		};
+	}
+
+	public static inline function world2LocalSpace(point:FastVector3):FastVector3 {
+		return {
+			x: point.x * projection.getScaleX() * 0.5 + 0.5,
+			y: point.y * projection.getScaleY() * 0.5 + 0.5,
+			z: point.z * projection.getScaleZ() * 0.5 + 0.5
+		};
+	}
+
+	public static inline function screen2LocalSpace(point:FastVector3):FastVector3 {
+		return {
+			x: point.x / WIDTH,
+			y: point.y / HEIGHT
+		};
+	}
+
+	public static inline function local2ScreenSpace(point:FastVector3):FastVector3 {
+		return {
+			x: point.x * WIDTH,
+			y: point.y * HEIGHT
+		};
+	}
+
+	public static inline function screen2WorldSpace(point:FastVector3):FastVector3 {
+		return local2WorldSpace(screen2LocalSpace(point));
+	}
+
+	public static inline function world2ScreenSpace(point:FastVector3):FastVector3 {
+		return local2ScreenSpace(world2LocalSpace(point));
 	}
 
 	public static inline function render(frames:Array<Framebuffer>):Void {

@@ -1,18 +1,17 @@
 package s2d.objects;
 
-import kha.FastFloat;
+import kha.math.FastVector3;
 import kha.math.FastMatrix4;
+
 // s2d
-import s2d.geometry.Transformation;
+using s2d.utils.FastMatrix4Ext;
 
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
-	public var x:FastFloat = 0.0;
-	public var y:FastFloat = 0.0;
-	public var z:FastFloat = 0.0;
-	public var transformation:Transformation = FastMatrix4.identity();
-	public var finalTransformation(get, never):Transformation;
+	public var location:FastVector3 = {};
+	public var transformation:FastMatrix4 = FastMatrix4.identity();
+	public var finalTransformation(get, never):FastMatrix4;
 
 	public inline function new() {}
 
@@ -50,7 +49,7 @@ class Object {
 			value.removeParent();
 	}
 
-	inline function get_finalTransformation():Transformation {
+	inline function get_finalTransformation():FastMatrix4 {
 		return parent == null ? transformation : parent.finalTransformation.multmat(transformation);
 	}
 }

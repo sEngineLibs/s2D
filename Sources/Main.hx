@@ -1,5 +1,6 @@
 package;
 
+import kha.math.FastMatrix4;
 import s2d.graphics.PostProcessing;
 import kha.input.Mouse;
 import s2d.graphics.Compositor;
@@ -11,25 +12,29 @@ import kha.Scheduler;
 import s2d.S2D;
 import s2d.objects.Sprite;
 
+using s2d.utils.FastMatrix4Ext;
+
 class Main {
 	public static function main() {
-		S2D.scale = 1.0;
-		S2D.distance = 2.0;
-
 		S2D.setup = function() {
 			var sprite = new Sprite();
-			sprite.material.depthScale = 1.0;
-			sprite.material.normalMap = Assets.images.get("normal");
-
+			sprite.material.colorMap = Assets.images.get("color");
 			var light = new Light();
-			light.z = 1.0;
+			light.location.z = 0.1;
 			light.power = 25;
 
+			Compositor.distortion.strength = 0.5;
+
 			Mouse.get().notify(null, null, function(x, y, xm, ym) {
-				PostProcessing.dof.distance = 1.0 - x / 1024;
-				var p = S2D.mapToProjection({x: x / 1024, y: y / 1024});
-				light.x = p.x;
-				light.y = p.y;
+				var p = S2D.screen2LocalSpace({x: x, y: y});
+				Compositor.distortion.x = p.x;
+				Compositor.distortion.y = p.y;
+
+				var p = S2D.screen2WorldSpace({x: x, y: y});
+				light.location.x = p.x;
+				light.location.y = p.y;
+			}, function(delta:Int) {
+				S2D.scale += delta * 0.1;
 			});
 		}
 

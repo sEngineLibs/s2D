@@ -3,14 +3,17 @@
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
-uniform sampler2D emissionMap;
+uniform sampler2D glowMap;
 uniform sampler2D ormMap; // [occlusion, roughness, metalness]
+
+uniform vec3 stageScale; // stage scale
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec2 lightAttrib; // [intensity, radius]
 
 in vec2 fragCoord;
+in vec4 fragmentColor;
 out vec4 fragColor;
 
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
@@ -41,14 +44,14 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 
 void main() {
     vec3 position = texture(positionMap, fragCoord).rgb;
-    position = position * 2.0 - 1.0;
+    position = (position * 2.0 - 1.0) / stageScale;
     vec3 normal = texture(normalMap, fragCoord).rgb;
     vec3 color = texture(colorMap, fragCoord).rgb;
     vec3 orm = texture(ormMap, fragCoord).rgb;
     float occlusion = orm.r;
     float roughness = orm.g;
     float metalness = orm.b;
-    vec3 emission = texture(emissionMap, fragCoord).rgb;
+    vec3 glow = texture(glowMap, fragCoord).rgb;
 
     vec3 l = lightPos - position;
     float distSq = dot(l, l);
@@ -73,5 +76,5 @@ void main() {
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
 
-    fragColor = vec4(clamp(emission + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 0.0, 1.0), 1.0);
+    fragColor = vec4(clamp(glow + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 0.0, 1.0), 1.0);
 }

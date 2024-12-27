@@ -10,6 +10,6 @@ private typedef DOF = {
 class PostProcessing {
 	public static var dof:DOF = {
 		distance: 0.5,
-		size: 0.05
+		size: 0.0
 	};
 }
