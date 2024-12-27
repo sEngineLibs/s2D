@@ -8,20 +8,30 @@ in vec2 texCoord;
 in vec4 color;
 out vec4 fragColor;
 
-#define dofQuality 8.0
-#define dofWeight (2.0 * dofQuality * dofQuality)
+#define dofSamples 12
+#define pi 3.14159265359
 
-vec3 blur(sampler2D tex, float size, vec2 uv) {
-    vec3 col = texture(tex, uv).rgb;
-    for (float y = -1.0; y < 1.0; y += 1.0 / dofQuality) 
-        for (float x = -1.0; x < 1.0; x += 1.0 / dofQuality) 
-            col += texture(tex, uv + vec2(x, y) * size).rgb;
-    return col / dofWeight;
+vec3 blur(sampler2D tex, vec2 uv, float radius) {
+    vec3 col = vec3(0.0);
+    float totalWeight = 0.0;
+
+    for (int i = 0; i < dofSamples; ++i) {
+        float angle = float(i) / float(dofSamples) * 2.0 * pi;
+        vec2 offset = vec2(cos(angle), sin(angle)) * radius;
+
+        float weight = exp(-dot(offset, offset) / (2.0 * radius * radius));
+        col += texture(tex, uv + offset).rgb * weight;
+        totalWeight += weight;
+    }
+    return col / totalWeight;
 }
 
 void main() {
-    float dist = abs(texture(positionMap, texCoord).z - dofAttrib.x);
+    float depth = texture(positionMap, texCoord).z;
+    float dist = abs(depth - dofAttrib.x);
 
-    vec3 col = blur(tex, dist * dofAttrib.y, texCoord);
+    float blurRadius = dist * dofAttrib.y;
+    vec3 col = blur(tex, texCoord, blurRadius);
+
     fragColor = vec4(col, 1.0);
 }
