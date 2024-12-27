@@ -1,6 +1,6 @@
 #version 450
 
-uniform mat4 model;
+uniform vec4 rot;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
 uniform sampler2D ormMap;
@@ -34,8 +34,8 @@ void main() {
     glow = texture(glowMap, fragUV) * glowStrength;
 
     // tangent space -> world space
-    normal.x = model[0][0] * n.x + model[1][0] * n.y;
-    normal.y = model[0][1] * n.x + model[1][1] * n.y;
+    normal.x = rot.x * n.x + rot.y * n.y;
+    normal.y = rot.z * n.x + rot.w * n.y;
     normal.z = 1.0;
     normal = normalize(normal);
 

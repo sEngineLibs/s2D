@@ -19,11 +19,12 @@ class Main {
 		S2D.setup = function() {
 			var sprite = new Sprite();
 			sprite.material.colorMap = Assets.images.get("color");
+			sprite.transformation.translate(-1.0, 0.0);
 			var light = new Light();
 			light.location.z = 0.1;
 			light.power = 25;
 
-			Compositor.distortion.strength = 0.5;
+			Compositor.distortion.strength = 1.0;
 
 			Mouse.get().notify(null, null, function(x, y, xm, ym) {
 				var p = S2D.screen2LocalSpace({x: x, y: y});

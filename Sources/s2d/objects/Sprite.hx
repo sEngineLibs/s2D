@@ -32,10 +32,10 @@ class Sprite extends Object {
 		vertices = new VertexBuffer(4, structure, StaticUsage);
 		var vert = vertices.lock();
 		for (i in 0...4) {
-			vert[i * structSize + 0] = i == 2 || i == 3 ? -1.0 : 1.0;
+			vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
 			vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
 			vert[i * structSize + 2] = 0.0;
-			vert[i * structSize + 3] = i == 2 || i == 3 ? 0.0 : 1.0;
+			vert[i * structSize + 3] = i == 0 || i == 1 ? 0.0 : 1.0;
 			vert[i * structSize + 4] = i == 0 || i == 3 ? 0.0 : 1.0;
 		}
 		vertices.unlock();

@@ -12,7 +12,7 @@ using s2d.utils.FastMatrix4Ext;
 
 class RenderPath {
 	public static inline function render(target:Canvas, stage:Stage):Void {
-		var VP = S2D.projection.multmat(stage.camera);
+		var MVP = S2D.projection.multmat(stage.camera);
 
 		// geometry pass
 		S2D.gbuffer[0].g4.begin([S2D.gbuffer[1], S2D.gbuffer[2], S2D.gbuffer[3], S2D.gbuffer[4]]);
@@ -20,8 +20,10 @@ class RenderPath {
 		S2D.gbuffer[0].g4.setPipeline(GeometryPass.pipeline);
 		S2D.gbuffer[0].g4.setIndexBuffer(Sprite.indices);
 		for (sprite in stage.sprites) {
-			S2D.gbuffer[0].g4.setMatrix(GeometryPass.modelCL, sprite.finalTransformation);
-			S2D.gbuffer[0].g4.setMatrix(GeometryPass.vpCL, VP);
+			var t = sprite.finalTransformation;
+
+			S2D.gbuffer[0].g4.setFloat4(GeometryPass.rotCL, t._00, t._01, t._10, t._11);
+			S2D.gbuffer[0].g4.setMatrix(GeometryPass.mvpCL, MVP.multmat(t));
 			S2D.gbuffer[0].g4.setTexture(GeometryPass.colorMapTU, sprite.material.colorMap);
 			S2D.gbuffer[0].g4.setTexture(GeometryPass.normalMapTU, sprite.material.normalMap);
 			S2D.gbuffer[0].g4.setTexture(GeometryPass.ormMapTU, sprite.material.ormMap);

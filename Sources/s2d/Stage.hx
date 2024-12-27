@@ -11,6 +11,6 @@ class Stage {
 	public var camera:FastMatrix4;
 
 	public inline function new() {
-		camera = FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: 1.0}, {x: 0.0, y: 1.0, z: 0.0});
+		camera = FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: -1.0}, {x: 0.0, y: 1.0, z: 0.0});
 	}
 }
