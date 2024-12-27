@@ -18,18 +18,19 @@ layout(location = 3) out vec4 orm;
 layout(location = 4) out vec4 emission;
 
 void main() {
-    vec3 tNormal = texture(normalMap, fragUV).rgb;
-    tNormal.xy = tNormal.xy * 2.0 - 1.0;
+    vec3 n = texture(normalMap, fragUV).rgb;
+    n.xy = n.xy * 2.0 - 1.0;
     position = vec4(fragPos, 1.0);
-    position.z += (tNormal.z) * depthScale;
+    position.z += (n.z) * depthScale;
     color = texture(colorMap, fragUV);
     orm = texture(ormMap, fragUV);
     emission = texture(emissionMap, fragUV);
 
-    // convert tangent space normals to world space normals
-    normal.x = model[0][0] * tNormal.x + model[1][0] * tNormal.y;
-    normal.y = model[0][1] * tNormal.x + model[1][1] * tNormal.y;
+    // tangent space -> world space
+    normal.x = model[0][0] * n.x + model[1][0] * n.y;
+    normal.y = model[0][1] * n.x + model[1][1] * n.y;
     normal.z = 1.0;
+    normal = normalize(normal);
 
     float mask = 1.0;
     // opaque

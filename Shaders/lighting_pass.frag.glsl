@@ -42,15 +42,12 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 void main() {
     vec3 position = texture(positionMap, fragCoord).rgb;
     position = position * 2.0 - 1.0;
-
-    vec3 normal = normalize(texture(normalMap, fragCoord).rgb);
+    vec3 normal = texture(normalMap, fragCoord).rgb;
     vec3 color = texture(colorMap, fragCoord).rgb;
-
     vec3 orm = texture(ormMap, fragCoord).rgb;
     float occlusion = orm.r;
     float roughness = orm.g;
     float metalness = orm.b;
-
     vec3 emission = texture(emissionMap, fragCoord).rgb;
 
     vec3 l = lightPos - position;

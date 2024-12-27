@@ -6,6 +6,7 @@ import s2d.objects.Sprite;
 import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.GeometryPass;
 import s2d.graphics.shaders.CompositorPass;
+import s2d.graphics.shaders.PostProcessingPass;
 
 class RenderPath {
 	public static inline function render(target:Canvas, stage:Stage):Void {
@@ -49,16 +50,25 @@ class RenderPath {
 		}
 		S2D.gbuffer[5].g2.end();
 
+		// postprocessing pass
+		S2D.gbuffer[6].g2.begin();
+		S2D.gbuffer[6].g4.setPipeline(PostProcessingPass.pipeline);
+		S2D.gbuffer[6].g4.setIndexBuffer(S2D.indices);
+		S2D.gbuffer[6].g4.setVertexBuffer(S2D.vertices);
+		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.positionMapTU, S2D.gbuffer[0]);
+		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.textureMapTU, S2D.gbuffer[5]);
+		S2D.gbuffer[6].g4.setFloat2(PostProcessingPass.dofAttribCL, PostProcessing.dof.distance + stage.camera.matrix._32, PostProcessing.dof.size);
+		S2D.gbuffer[6].g4.drawIndexedVertices();
+		S2D.gbuffer[6].g2.end();
+
 		// compositor pass
 		target.g2.begin();
 		target.g4.setPipeline(CompositorPass.pipeline);
 		target.g4.setIndexBuffer(S2D.indices);
 		target.g4.setVertexBuffer(S2D.vertices);
-		target.g4.setTexture(CompositorPass.positionMapTU, S2D.gbuffer[0]);
-		target.g4.setTexture(CompositorPass.textureMapTU, S2D.gbuffer[5]);
+		target.g4.setTexture(CompositorPass.textureMapTU, S2D.gbuffer[6]);
 		target.g4.setFloat2(CompositorPass.resolutionCL, target.width, target.height);
-		target.g4.setFloat3(CompositorPass.dofAttribCL, Compositor.dof.focusDistance, Compositor.dof.fStop, Compositor.dof.blades);
-		target.g4.setFloat(CompositorPass.fisheyePowerCL, Compositor.fisheye.power);
+		target.g4.setFloat3(CompositorPass.distortionAttribCL, Compositor.distortion.x, Compositor.distortion.y, Compositor.distortion.strength);
 		target.g4.drawIndexedVertices();
 		target.g2.end();
 	};

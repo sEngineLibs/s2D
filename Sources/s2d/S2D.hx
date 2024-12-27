@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.math.FastVector2;
 import kha.Image;
 import kha.System;
 import kha.Assets;
@@ -17,6 +18,7 @@ import s2d.graphics.RenderPath;
 import s2d.graphics.shaders.GeometryPass;
 import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.CompositorPass;
+import s2d.graphics.shaders.PostProcessingPass;
 
 class S2D {
 	public static var indices:IndexBuffer;
@@ -31,43 +33,44 @@ class S2D {
 	public static var setup:Void->Void;
 
 	public static inline function init(window:Window) {
-		// init indices
-		indices = new IndexBuffer(6, StaticUsage);
-		var ind = indices.lock();
-		ind[0] = 0;
-		ind[1] = 1;
-		ind[2] = 2;
-		ind[3] = 3;
-		ind[4] = 2;
-		ind[5] = 0;
-		indices.unlock();
-
-		// init structure
-		var structure = new VertexStructure();
-		structure.add("vertCoord", Float32_2X);
-		var structSize = 2;
-
-		// init vertices
-		vertices = new VertexBuffer(4, structure, StaticUsage);
-		var vert = vertices.lock();
-		for (i in 0...4) {
-			vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
-			vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
-		}
-		vertices.unlock();
-
-		aspectRatio = window.width / window.height;
-		// [position, normal, color, orm, emission, compositor]
-		for (i in 0...6)
-			gbuffer.push(Image.createRenderTarget(window.width, window.height));
-
-		window.notifyOnResize(resize);
-
 		Assets.loadEverything(function() {
 			GeometryPass.compile();
 			LightingPass.compile();
 			CompositorPass.compile();
+			PostProcessingPass.compile();
 			Sprite.init();
+
+			// init indices
+			indices = new IndexBuffer(6, StaticUsage);
+			var ind = indices.lock();
+			ind[0] = 0;
+			ind[1] = 1;
+			ind[2] = 2;
+			ind[3] = 3;
+			ind[4] = 2;
+			ind[5] = 0;
+			indices.unlock();
+
+			// init structure
+			var structure = new VertexStructure();
+			structure.add("vertCoord", Float32_2X);
+			var structSize = 2;
+
+			// init vertices
+			vertices = new VertexBuffer(4, structure, StaticUsage);
+			var vert = vertices.lock();
+			for (i in 0...4) {
+				vert[i * structSize + 0] = i == 0 || i == 1 ? -1.0 : 1.0;
+				vert[i * structSize + 1] = i == 0 || i == 3 ? -1.0 : 1.0;
+			}
+			vertices.unlock();
+
+			aspectRatio = window.width / window.height;
+			// [position, normal, color, orm, emission, postprocessing, compositing]
+			for (i in 0...7)
+				gbuffer.push(Image.createRenderTarget(window.width, window.height));
+
+			window.notifyOnResize(resize);
 
 			setup();
 
@@ -104,6 +107,13 @@ class S2D {
 			projection = FastMatrix4.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale, 0.0, distance);
 		else
 			projection = FastMatrix4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, distance);
+	}
+
+	public static inline function mapToProjection(point:FastVector2):FastVector2 {
+		return {
+			x: (point.x * 2.0 - 1.0) * Math.sqrt(projection._00 * projection._00 + projection._10 * projection._10),
+			y: -(point.y * 2.0 - 1.0) * Math.sqrt(projection._01 * projection._01 + projection._11 * projection._11)
+		};
 	}
 
 	public static inline function render(frames:Array<Framebuffer>):Void {

@@ -6,12 +6,12 @@ import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 
-class CompositorPass {
+class PostProcessingPass {
 	public static var pipeline:PipelineState;
 
 	public static var textureMapTU:TextureUnit;
-	public static var resolutionCL:ConstantLocation;
-	public static var distortionAttribCL:ConstantLocation;
+	public static var positionMapTU:TextureUnit;
+	public static var dofAttribCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -20,11 +20,11 @@ class CompositorPass {
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
 		pipeline.vertexShader = Shaders.s2d_2d_vert;
-		pipeline.fragmentShader = Shaders.compositor_pass_frag;
+		pipeline.fragmentShader = Shaders.postprocessing_pass_frag;
 		pipeline.compile();
 
 		textureMapTU = pipeline.getTextureUnit("textureMap");
-		resolutionCL = pipeline.getConstantLocation("resolution");
-		distortionAttribCL = pipeline.getConstantLocation("distortionAttrib");
+		positionMapTU = pipeline.getTextureUnit("positionMap");
+		dofAttribCL = pipeline.getConstantLocation("dofAttrib");
 	}
 }

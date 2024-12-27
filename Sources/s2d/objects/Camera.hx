@@ -8,6 +8,12 @@ abstract Camera(FastMatrix4) from FastMatrix4 to FastMatrix4 {
 		this = value;
 	}
 
+	public var matrix(get, never):FastMatrix4;
+
+	inline function get_matrix():FastMatrix4 {
+		return this;
+	}
+
 	public static inline function create() {
 		// [world position, look at, head up]
 		return new Camera(FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: 1.0}, {x: 0.0, y: -1.0, z: 0.0}));
