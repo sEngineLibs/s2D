@@ -15,7 +15,7 @@ class GeometryPass {
 	public static var normalMapTU:TextureUnit;
 	public static var ormMapTU:TextureUnit;
 	public static var glowMapTU:TextureUnit;
-	public static var matAttribCL:ConstantLocation;
+	public static var paramsCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -38,6 +38,6 @@ class GeometryPass {
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 		glowMapTU = pipeline.getTextureUnit("glowMap");
-		matAttribCL = pipeline.getConstantLocation("matAttrib");
+		paramsCL = pipeline.getConstantLocation("Params");
 	}
 }

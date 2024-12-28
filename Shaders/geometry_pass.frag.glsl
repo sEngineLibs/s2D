@@ -6,10 +6,10 @@ uniform sampler2D colorMap;
 uniform sampler2D ormMap;
 uniform sampler2D glowMap;
 
-// blendMode
-// depthScale
-// glowStrength
-uniform float matAttrib[3];
+// 0 - blend mode
+// 1 - depth scale
+// 2 - glow strength
+uniform float Params[8];
 
 in vec3 fragPos;
 in vec2 fragUV;
@@ -21,10 +21,12 @@ layout(location = 3) out vec4 orm;
 layout(location = 4) out vec4 glow;
 
 void main() {
-    int blendMode = int(matAttrib[0]);
-    float depthScale = matAttrib[1];
-    float glowStrength = matAttrib[2];
+    // fetch material parameters
+    int blendMode = int(Params[0]);
+    float depthScale = Params[1];
+    float glowStrength = Params[2];
 
+    // fetch material textures
     vec3 n = texture(normalMap, fragUV).rgb;
     n.xy = n.xy * 2.0 - 1.0;
     position = vec4(fragPos, 1.0);
@@ -33,12 +35,13 @@ void main() {
     orm = texture(ormMap, fragUV);
     glow = texture(glowMap, fragUV) * glowStrength;
 
-    // tangent space -> world space
-    normal.x = rot.x * n.x + rot.y * n.y;
-    normal.y = rot.z * n.x + rot.w * n.y;
+    // tangent space -> world space    
+    normal.x = rot.x * n.x + rot.z * n.y;
+    normal.y = rot.y * n.x + rot.w * n.y;
     normal.z = 1.0;
     normal = normalize(normal);
 
+    // apply blend mode
     float mask = 1.0;
     // opaque
     if (blendMode == 0) {

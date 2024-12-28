@@ -8,8 +8,7 @@ import kha.graphics4.ConstantLocation;
 class CompositorPass {
 	public static var pipeline:PipelineState;
 
-	public static var resolutionCL:ConstantLocation;
-	public static var distortionAttribCL:ConstantLocation;
+	public static var paramsCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -23,7 +22,6 @@ class CompositorPass {
 		pipeline.fragmentShader = Shaders.compositor_pass_frag;
 		pipeline.compile();
 
-		resolutionCL = pipeline.getConstantLocation("resolution");
-		distortionAttribCL = pipeline.getConstantLocation("distortionAttrib");
+		paramsCL = pipeline.getConstantLocation("Params");
 	}
 }

@@ -2,19 +2,16 @@ package s2d;
 
 import kha.Image;
 import kha.System;
-import kha.Assets;
-import kha.Window;
 import kha.FastFloat;
 import kha.Framebuffer;
 import kha.math.FastVector3;
 import kha.math.FastMatrix4;
-import kha.graphics4.VertexBuffer;
-import kha.graphics4.IndexBuffer;
-import kha.graphics4.VertexStructure;
 // s2d
 import s2d.Stage;
 import s2d.objects.Sprite;
 import s2d.graphics.RenderPath;
+import s2d.graphics.Compositor;
+import s2d.graphics.PostProcessing;
 import s2d.graphics.shaders.GeometryPass;
 import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.CompositorPass;
@@ -25,41 +22,74 @@ using s2d.utils.FastMatrix4Ext;
 class S2D {
 	public static var projection:FastMatrix4;
 	public static var gbuffer:Array<Image> = [];
-	public static var WIDTH:Int;
-	public static var HEIGHT:Int;
+
+	public static var width:Int;
+	public static var height:Int;
+	public static var realWidth(get, set):Int;
+	public static var realHeight(get, set):Int;
+	@:isVar public static var resolutionScale(default, set):FastFloat = 1.0;
+
 	@:isVar public static var scale(default, set):FastFloat = 1.0;
 	@:isVar public static var distance(default, set):FastFloat = 1.0;
 	@:isVar public static var aspectRatio(default, set):FastFloat = 1.0;
 
 	public static var stage:Stage = new Stage();
+	public static var postProcessing:PostProcessing = new PostProcessing();
+	public static var compositor:Compositor = new Compositor();
 	public static var setup:Void->Void;
 
-	public static inline function init(window:Window) {
-		Assets.loadEverything(function() {
-			GeometryPass.compile();
-			LightingPass.compile();
-			CompositorPass.compile();
-			PostProcessingPass.compile();
-			Sprite.init();
-
-			WIDTH = window.width;
-			HEIGHT = window.height;
-			aspectRatio = window.width / window.height;
-			// [position, normal, color, orm, glow, postprocessing, compositing]
-			for (i in 0...7)
-				gbuffer.push(Image.createRenderTarget(window.width, window.height));
-
-			window.notifyOnResize(resize);
-
-			setup();
-
-			System.notifyOnFrames(render);
-		});
+	static inline function get_realWidth():Int {
+		return Std.int(width / resolutionScale);
 	}
 
-	public static inline function resize(width:Int, height:Int) {
-		WIDTH = width;
-		HEIGHT = height;
+	static inline function set_realWidth(value:Int):Int {
+		width = Std.int(value * resolutionScale);
+		return value;
+	}
+
+	static inline function get_realHeight():Int {
+		return Std.int(height / resolutionScale);
+	}
+
+	static inline function set_realHeight(value:Int):Int {
+		height = Std.int(value * resolutionScale);
+		return value;
+	}
+
+	static inline function set_resolutionScale(value:FastFloat):FastFloat {
+		width = Std.int(width * resolutionScale / value);
+		height = Std.int(height * resolutionScale / value);
+		resolutionScale = value;
+
+		return value;
+	}
+
+	public static inline function ready(w:Int, h:Int) {
+		Sprite.init();
+		realWidth = w;
+		realHeight = h;
+
+		aspectRatio = width / height;
+		for (i in 0...7)
+			gbuffer.push(Image.createRenderTarget(width, height));
+	}
+
+	public static inline function set() {
+		GeometryPass.compile();
+		LightingPass.compile();
+		CompositorPass.compile();
+		PostProcessingPass.compile();
+		setup();
+	}
+
+	public static inline function go() {
+		System.notifyOnFrames(render);
+	}
+
+	public static inline function resize(w:Int, h:Int) {
+		realWidth = w;
+		realHeight = h;
+
 		aspectRatio = width / height;
 		for (i in 0...gbuffer.length)
 			gbuffer[i] = Image.createRenderTarget(width, height);
@@ -110,15 +140,15 @@ class S2D {
 
 	public static inline function screen2LocalSpace(point:FastVector3):FastVector3 {
 		return {
-			x: point.x / WIDTH,
-			y: point.y / HEIGHT
+			x: point.x / realWidth,
+			y: point.y / realHeight
 		};
 	}
 
 	public static inline function local2ScreenSpace(point:FastVector3):FastVector3 {
 		return {
-			x: point.x * WIDTH,
-			y: point.y * HEIGHT
+			x: point.x * realWidth,
+			y: point.y * realHeight
 		};
 	}
 

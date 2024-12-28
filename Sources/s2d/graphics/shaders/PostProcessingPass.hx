@@ -10,7 +10,7 @@ class PostProcessingPass {
 	public static var pipeline:PipelineState;
 
 	public static var positionMapTU:TextureUnit;
-	public static var dofAttribCL:ConstantLocation;
+	public static var paramsCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -25,6 +25,6 @@ class PostProcessingPass {
 		pipeline.compile();
 
 		positionMapTU = pipeline.getTextureUnit("positionMap");
-		dofAttribCL = pipeline.getConstantLocation("dofAttrib");
+		paramsCL = pipeline.getConstantLocation("Params");
 	}
 }

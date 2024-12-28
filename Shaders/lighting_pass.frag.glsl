@@ -43,15 +43,19 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 }
 
 void main() {
+    // fetch gbuffer textures
     vec3 position = texture(positionMap, fragCoord).rgb;
-    position = (position * 2.0 - 1.0) / stageScale;
     vec3 normal = texture(normalMap, fragCoord).rgb;
     vec3 color = texture(colorMap, fragCoord).rgb;
     vec3 orm = texture(ormMap, fragCoord).rgb;
+    vec3 glow = texture(glowMap, fragCoord).rgb;
+
     float occlusion = orm.r;
     float roughness = orm.g;
     float metalness = orm.b;
-    vec3 glow = texture(glowMap, fragCoord).rgb;
+    
+    // adjust position
+    position = (position * 2.0 - 1.0) / stageScale;
 
     vec3 l = lightPos - position;
     float distSq = dot(l, l);
@@ -72,9 +76,9 @@ void main() {
     float G = geometrySmith(normal, V, dir, roughness);
     vec3 specularLight = NDF * G * F / max(4.0 * max(dot(normal, V), 0.0) * max(dot(normal, dir), 0.0), 1e-4);
 
-    // Diffuse
+    // diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
-
+    
     fragColor = vec4(clamp(glow + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 0.0, 1.0), 1.0);
 }
