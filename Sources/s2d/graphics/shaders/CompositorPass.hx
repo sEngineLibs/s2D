@@ -1,5 +1,6 @@
 package s2d.graphics.shaders;
 
+import kha.graphics4.TextureUnit;
 import kha.Shaders;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
@@ -8,6 +9,7 @@ import kha.graphics4.ConstantLocation;
 class CompositorPass {
 	public static var pipeline:PipelineState;
 
+	public static var texTU:TextureUnit;
 	public static var paramsCL:ConstantLocation;
 
 	public static function compile() {
@@ -22,6 +24,7 @@ class CompositorPass {
 		pipeline.fragmentShader = Shaders.compositor_pass_frag;
 		pipeline.compile();
 
+		texTU = pipeline.getTextureUnit("tex");
 		paramsCL = pipeline.getConstantLocation("Params");
 	}
 }
