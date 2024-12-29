@@ -71,8 +71,20 @@ class S2D {
 		realHeight = h;
 
 		aspectRatio = width / height;
-		for (i in 0...7)
-			gbuffer.push(Image.createRenderTarget(width, height));
+		// position
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA128, DepthOnly));
+		// normal
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
+		// color
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
+		// [occlusion, roughness, metallness]
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
+		// glow
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
+		// post processing
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil));
+		// compositor
+		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil));
 	}
 
 	public static inline function set() {
@@ -92,8 +104,20 @@ class S2D {
 		realHeight = h;
 
 		aspectRatio = width / height;
-		for (i in 0...gbuffer.length)
-			gbuffer[i] = Image.createRenderTarget(width, height);
+		// position
+		gbuffer[0] = Image.createRenderTarget(width, height, RGBA128, DepthOnly);
+		// normal
+		gbuffer[1] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
+		// color
+		gbuffer[2] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
+		// [occlusion, roughness, metallness]
+		gbuffer[3] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
+		// glow
+		gbuffer[4] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
+		// post processing
+		gbuffer[5] = Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil);
+		// compositor
+		gbuffer[6] = Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil);
 	}
 
 	static inline function set_scale(value:FastFloat):FastFloat {

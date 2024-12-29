@@ -70,10 +70,10 @@ class RenderPath {
 		// compositor pass
 		target.g2.begin(true, S2D.compositor.letterBoxColor);
 		target.g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
-		target.g2.pipeline = CompositorPass.pipeline;
-		target.g4.setPipeline(CompositorPass.pipeline);
-		target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
-		target.g2.drawScaledImage(S2D.gbuffer[6], 0, 0, target.width, target.height);
+		// target.g2.pipeline = CompositorPass.pipeline;
+		// target.g4.setPipeline(CompositorPass.pipeline);
+		// target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
+		target.g2.drawScaledImage(S2D.gbuffer[5], 0, 0, target.width, target.height);
 		target.g2.disableScissor();
 		target.g2.end();
 	};

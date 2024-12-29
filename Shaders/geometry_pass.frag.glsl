@@ -36,10 +36,9 @@ void main() {
     glow = texture(glowMap, fragUV) * glowStrength;
 
     // tangent space -> world space    
-    normal.x = rot.x * n.x + rot.z * n.y;
-    normal.y = rot.y * n.x + rot.w * n.y;
+    normal.x = (rot.x * n.x + rot.z * n.y) * 0.5 + 0.5;
+    normal.y = (rot.y * n.x + rot.w * n.y) * 0.5 + 0.5;
     normal.z = 1.0;
-    normal = normalize(normal);
 
     // apply blend mode
     float mask = 1.0;

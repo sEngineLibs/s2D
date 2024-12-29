@@ -54,8 +54,10 @@ void main() {
     float roughness = orm.g;
     float metalness = orm.b;
     
-    // adjust position
-    position = normalize(InvVP * vec4(position * 2.0 - 1.0, 1.0)).xyz;
+    // convert data
+    vec4 worldPos = InvVP * vec4(position * 2.0 - 1.0, 1.0);
+    position = worldPos.xyz / worldPos.w;
+    normal = normalize(normal * 2.0 - 1.0);
 
     vec3 l = lightPos - position;
     float distSq = dot(l, l);
@@ -69,16 +71,16 @@ void main() {
 
     // Fresnel
     vec3 F0 = mix(vec3(0.04), color, metalness);
-    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+    vec3 F = fresnelSchlick(dot(H, V), F0);
 
     // BRDF components
     float NDF = distributionGGX(normal, H, roughness);
     float G = geometrySmith(normal, V, dir, roughness);
-    vec3 specularLight = NDF * G * F / max(4.0 * max(dot(normal, V), 0.0) * max(dot(normal, dir), 0.0), 1e-4);
+    vec3 specularLight = NDF * G * F / 4.0 * dot(normal, V) * dot(normal, dir);
 
     // diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
-    vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
-    
-    fragColor = vec4(clamp(glow + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 0.0, 1.0), 1.0);
+    vec3 diffuseLight = kD * color * dot(normal, dir) / PI;
+
+    fragColor = vec4(glow + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 1.0);
 }
