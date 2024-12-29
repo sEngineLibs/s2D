@@ -54,18 +54,22 @@ class RenderPath {
 		S2D.gbuffer[5].g2.end();
 
 		// postprocessing pass
-		S2D.gbuffer[6].g2.begin();
-		S2D.gbuffer[6].g2.pipeline = PostProcessingPass.pipeline;
+		S2D.gbuffer[6].g2.begin(false);
 		S2D.gbuffer[6].g4.setPipeline(PostProcessingPass.pipeline);
+		S2D.gbuffer[6].g4.setIndexBuffer(Sprite.indices);
+		S2D.gbuffer[6].g4.setVertexBuffer(Sprite.vertices);
 		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.positionMapTU, S2D.gbuffer[0]);
-		S2D.gbuffer[6].g4.setFloat2(PostProcessingPass.resolutionCL, S2D.width, S2D.height);
+		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.textureMapTU, S2D.gbuffer[5]);
 		S2D.gbuffer[6].g4.setFloats(PostProcessingPass.paramsCL, S2D.postProcessing.params);
-		S2D.gbuffer[6].g2.drawImage(S2D.gbuffer[5], 0, 0);
+		S2D.gbuffer[6].g4.setMatrix(PostProcessingPass.invVPCL, VP.inverse());
+		S2D.gbuffer[6].g4.setFloat3(PostProcessingPass.cameraPosCL, stage.camera.getTranslationX(), stage.camera.getTranslationY(),
+			stage.camera.getTranslationZ());
+		S2D.gbuffer[6].g4.drawIndexedVertices();
 		S2D.gbuffer[6].g2.end();
 
 		// compositor pass
 		target.g2.begin(true, S2D.compositor.letterBoxColor);
-		target.g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight);
+		target.g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
 		target.g2.pipeline = CompositorPass.pipeline;
 		target.g4.setPipeline(CompositorPass.pipeline);
 		target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);

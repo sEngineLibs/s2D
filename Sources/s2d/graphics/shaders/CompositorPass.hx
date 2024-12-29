@@ -1,7 +1,7 @@
 package s2d.graphics.shaders;
 
-import kha.graphics4.TextureUnit;
 import kha.Shaders;
+import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;

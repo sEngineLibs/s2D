@@ -2,7 +2,6 @@ package s2d.graphics;
 
 import kha.Color;
 import kha.FastFloat;
-import kha.math.FastVector2;
 import kha.arrays.Float32Array;
 
 @:allow(s2d.graphics.RenderPath)
@@ -14,15 +13,17 @@ class PostProcessing {
 	public var mistNear(get, set):FastFloat;
 	public var mistFar(get, set):FastFloat;
 	public var mistColor(get, set):Color;
+	public var motionBlur(get, set):FastFloat;
 
 	public inline function new() {
-		params = new Float32Array(8);
+		params = new Float32Array(9);
 
 		dofDistance = 0.5;
-		dofSize = 0.01;
+		dofSize = 0.0;
 		mistNear = 0.0;
 		mistFar = 1.0;
 		mistColor = Transparent;
+		motionBlur = 0.0;
 	}
 
 	inline function get_dofDistance():FastFloat {
@@ -70,6 +71,15 @@ class PostProcessing {
 		params[5] = value.G;
 		params[6] = value.B;
 		params[7] = value.A;
+		return value;
+	}
+
+	inline function get_motionBlur():FastFloat {
+		return 1.0 - params[8];
+	}
+
+	inline function set_motionBlur(value:FastFloat):FastFloat {
+		params[8] = 1.0 - value;
 		return value;
 	}
 }
