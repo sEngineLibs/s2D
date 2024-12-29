@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.math.FastVector4;
 import kha.Image;
 import kha.System;
 import kha.FastFloat;
@@ -123,18 +124,32 @@ class S2D {
 	}
 
 	public static inline function local2WorldSpace(point:FastVector3):FastVector3 {
+		var wsp = stage.viewProjection.inverse().multvec({
+			x: point.x * 2.0 - 1.0,
+			y: point.y * 2.0 - 1.0,
+			z: point.z * 2.0 - 1.0,
+			w: 1.0
+		});
+
 		return {
-			x: (point.x * 2.0 - 1.0) / projection.getScaleX(),
-			y: (point.y * 2.0 - 1.0) / projection.getScaleY(),
-			z: (point.z * 2.0 - 1.0) / projection.getScaleZ()
+			x: wsp.x,
+			y: wsp.y,
+			z: wsp.z
 		};
 	}
 
 	public static inline function world2LocalSpace(point:FastVector3):FastVector3 {
+		var ncp = stage.viewProjection.multvec({
+			x: point.x,
+			y: point.y,
+			z: point.z,
+			w: 1.0
+		});
+
 		return {
-			x: point.x * projection.getScaleX() * 0.5 + 0.5,
-			y: point.y * projection.getScaleY() * 0.5 + 0.5,
-			z: point.z * projection.getScaleZ() * 0.5 + 0.5
+			x: ncp.x * 0.5 + 0.5,
+			y: ncp.y * 0.5 + 0.5,
+			z: ncp.z * 0.5 + 0.5
 		};
 	}
 

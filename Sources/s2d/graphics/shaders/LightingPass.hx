@@ -14,7 +14,7 @@ class LightingPass {
 	public static var normalMapTU:TextureUnit;
 	public static var ormMapTU:TextureUnit;
 	public static var glowMapTU:TextureUnit;
-	public static var stageScaleCL:ConstantLocation;
+	public static var invVPCL:ConstantLocation;
 	public static var lightPosCL:ConstantLocation;
 	public static var lightColorCL:ConstantLocation;
 	public static var lightAttribCL:ConstantLocation;
@@ -37,7 +37,7 @@ class LightingPass {
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 		glowMapTU = pipeline.getTextureUnit("glowMap");
-		stageScaleCL = pipeline.getConstantLocation("stageScale");
+		invVPCL = pipeline.getConstantLocation("InvVP");
 		lightPosCL = pipeline.getConstantLocation("lightPos");
 		lightColorCL = pipeline.getConstantLocation("lightColor");
 		lightAttribCL = pipeline.getConstantLocation("lightAttrib");

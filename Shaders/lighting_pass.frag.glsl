@@ -6,7 +6,7 @@ uniform sampler2D colorMap;
 uniform sampler2D glowMap;
 uniform sampler2D ormMap; // [occlusion, roughness, metalness]
 
-uniform vec3 stageScale; // stage scale
+uniform mat4 InvVP;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -55,7 +55,7 @@ void main() {
     float metalness = orm.b;
     
     // adjust position
-    position = (position * 2.0 - 1.0) / stageScale;
+    position = normalize(InvVP * vec4(position * 2.0 - 1.0, 1.0)).xyz;
 
     vec3 l = lightPos - position;
     float distSq = dot(l, l);

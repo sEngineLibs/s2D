@@ -11,7 +11,8 @@ class PostProcessing {
 
 	public var dofDistance(get, set):FastFloat;
 	public var dofSize(get, set):FastFloat;
-	public var mistScale(get, set):FastVector2;
+	public var mistNear(get, set):FastFloat;
+	public var mistFar(get, set):FastFloat;
 	public var mistColor(get, set):Color;
 
 	public inline function new() {
@@ -19,7 +20,8 @@ class PostProcessing {
 
 		dofDistance = 0.5;
 		dofSize = 0.01;
-		mistScale = {x: 0.0, y: 1.0};
+		mistNear = 0.0;
+		mistFar = 1.0;
 		mistColor = Transparent;
 	}
 
@@ -41,16 +43,21 @@ class PostProcessing {
 		return value;
 	}
 
-	inline function get_mistScale():FastVector2 {
-		return {
-			x: params[2],
-			y: params[3]
-		};
+	inline function get_mistNear():FastFloat {
+		return params[2];
 	}
 
-	inline function set_mistScale(value:FastVector2):FastVector2 {
-		params[2] = value.x;
-		params[3] = value.y;
+	inline function set_mistNear(value:FastFloat):FastFloat {
+		params[2] = value;
+		return value;
+	}
+
+	inline function get_mistFar():FastFloat {
+		return params[3];
+	}
+
+	inline function set_mistFar(value:FastFloat):FastFloat {
+		params[3] = value;
 		return value;
 	}
 

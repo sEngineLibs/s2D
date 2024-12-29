@@ -10,6 +10,12 @@ class Stage {
 	public var lights:Array<Light> = [];
 	public var camera:FastMatrix4;
 
+	public var viewProjection(get, null):FastMatrix4;
+
+	inline function get_viewProjection() {
+		return S2D.projection.multmat(camera);
+	}
+
 	public inline function new() {
 		camera = FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: -1.0}, {x: 0.0, y: 1.0, z: 0.0});
 	}

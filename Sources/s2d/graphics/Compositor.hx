@@ -1,5 +1,6 @@
 package s2d.graphics;
 
+import kha.Color;
 import kha.FastFloat;
 import kha.math.FastVector2;
 import kha.arrays.Float32Array;
@@ -8,9 +9,11 @@ import kha.arrays.Float32Array;
 class Compositor {
 	var params:Float32Array;
 
+	public var letterBoxHeight:Int = 0;
+	public var letterBoxColor:Color = Black;
+	public var vignetteStrength(get, set):FastFloat;
 	public var distortionPosition(get, set):FastVector2;
 	public var distortionStrength(get, set):FastFloat;
-	public var vignetteStrength(get, set):FastFloat;
 
 	public inline function new() {
 		params = new Float32Array(4);

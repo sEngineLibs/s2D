@@ -10,6 +10,7 @@ class PostProcessingPass {
 	public static var pipeline:PipelineState;
 
 	public static var positionMapTU:TextureUnit;
+	public static var resolutionCL:ConstantLocation;
 	public static var paramsCL:ConstantLocation;
 
 	public static function compile() {
@@ -25,6 +26,7 @@ class PostProcessingPass {
 		pipeline.compile();
 
 		positionMapTU = pipeline.getTextureUnit("positionMap");
+		resolutionCL = pipeline.getConstantLocation("resolution");
 		paramsCL = pipeline.getConstantLocation("Params");
 	}
 }
