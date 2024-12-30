@@ -13,7 +13,7 @@ class Stage {
 	public var lights:Array<Light> = [];
 	public var camera:FastMatrix4;
 	public var viewProjection(get, null):FastMatrix4;
-	public var environmentMap:Image;
+	@:isVar public var environmentMap(default, set):Image;
 
 	final maxLights:Int = 16;
 	final lightStructSize:Int = 8;
@@ -45,5 +45,11 @@ class Stage {
 			lightsData[ind + 7] = light.radius;
 		}
 		return lightsData;
+	}
+
+	inline function set_environmentMap(value:Image):Image {
+		value.generateMipmaps(1);
+		environmentMap = value;
+		return value;
 	}
 }

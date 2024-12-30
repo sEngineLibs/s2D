@@ -47,8 +47,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * factor;
 }
 
-float distributionGGX(vec3 N, vec3 H, float roughness) {
-    float a = roughness * roughness;
+float distributionGGX(vec3 N, vec3 H, float roughnessE2) {
+    float a = roughnessE2;
     float a2 = a * a;
     float NdotH = max(dot(N, H), 0.0);
     float denom = NdotH * (a2 - 1.0) + 1.0;
@@ -59,8 +59,8 @@ float geometrySchlickGGX(float NdotX, float k) {
     return NdotX / (NdotX * (1.0 - k) + k);
 }
 
-float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
-    float k = roughness * roughness * 0.5;
+float geometrySmith(vec3 N, vec3 V, vec3 L, float roughnessE2) {
+    float k = roughnessE2 * 0.5;
     return geometrySchlickGGX(max(dot(N, V), 0.0), k) *
            geometrySchlickGGX(max(dot(N, L), 0.0), k);
 }
@@ -81,8 +81,9 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
     vec3 F = fresnelSchlick(dot(H, V), F0);
 
     // BRDF components
-    float NDF = distributionGGX(normal, H, roughness);
-    float G = geometrySmith(normal, V, dir, roughness);
+    float roughnessE2 = roughness * roughness;
+    float NDF = distributionGGX(normal, H, roughnessE2);
+    float G = geometrySmith(normal, V, dir, roughnessE2);
     vec3 specularLight = (NDF * G * F) / 4.0 * dot(normal, V) * dot(normal, dir);
 
     // diffuse
@@ -92,13 +93,13 @@ vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughne
     return (diffuseLight + specularLight) * light.color * lightAttenuation;
 }
 
-vec3 environmentLighting(vec3 normal, vec3 color, float roughness, float metalness) {
+vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 V = normalize(viewDir);
 
-    // Radiance (Specular)
-    vec3 reflection = reflect(-V, normal);
-    reflection = normalize(reflection);
-    vec3 radiance = textureLod(envMap, reflection.xy * 0.5 + 0.5, 0.0).rgb;
+    // radiance
+    vec3 reflection = normalize(reflect(-V, normal));
+    float mipLevel = roughness * 8.0;
+    vec3 radiance = textureLod(envMap, reflection.xy * 0.5 + 0.5, mipLevel).rgb;
 
     // Fresnel
     vec3 F0 = mix(vec3(0.04), color, metalness);
@@ -106,8 +107,8 @@ vec3 environmentLighting(vec3 normal, vec3 color, float roughness, float metalne
 
     vec3 specular = radiance * F;
 
-    // Irradiance (Diffuse)
-    vec3 diffuseIrradiance = texture(envMap, normal.xy * 0.5 + 0.5).rgb;
+    // irradiance
+    vec3 diffuseIrradiance = textureLod(envMap, normal.xy * 0.5 + 0.5, 8.0).rgb;
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuse = kD * color * diffuseIrradiance;
 
@@ -137,8 +138,8 @@ void main() {
     for (int i = 0; i < lightCount; ++i)
         c += lighting(getLight(i), position, normal, color, roughness, metalness);
 
-    // combine lighting
-    c = glow + occlusion * (c + environmentLighting(normal, color, roughness, metalness));
+    // environment lighting
+    vec3 e = envLighting(normal, color, roughness, metalness);
 
-    fragColor = vec4(c, 1.0);
+    fragColor = vec4(glow + occlusion * (c + e), 1.0);
 }

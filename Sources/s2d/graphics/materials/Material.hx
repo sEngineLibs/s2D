@@ -9,15 +9,15 @@ class Material {
 	public var normalMap:Image;
 	public var ormMap:Image;
 	public var glowMap:Image;
-	public var params:Float32Array;
 
+	public var params:Float32Array;
 	public var blendMode(get, set):BlendMode;
 	public var depthScale(get, set):FastFloat;
 	public var glowStrength(get, set):FastFloat;
 
 	public inline function new() {
 		params = new Float32Array(3);
-		blendMode = AlphaBlend;
+		blendMode = AlphaClip;
 		depthScale = 0.0;
 		glowStrength = 1.0;
 	}

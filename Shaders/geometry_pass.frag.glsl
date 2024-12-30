@@ -9,7 +9,7 @@ uniform sampler2D glowMap;
 // 0 - blend mode
 // 1 - depth scale
 // 2 - glow strength
-uniform float Params[8];
+uniform float Params[3];
 
 in vec3 fragPos;
 in vec2 fragUV;
@@ -50,12 +50,14 @@ void main() {
         mask = smoothstep(0.49, 0.51, color.a);
         color.a = mask;
     // alpha blend
-    } else { 
-        mask = smoothstep(0.01, 1.0, color.a);
+    } else {
+        mask = smoothstep(0.00, 0.01, color.a);
     }
 
     normal.a = mask;
     position.a = mask;
     orm.a = mask;
     glow.a = mask;
+
+    position = vec4(color.a);
 }

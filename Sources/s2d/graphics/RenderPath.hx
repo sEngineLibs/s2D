@@ -45,6 +45,7 @@ class RenderPath {
 		S2D.gbuffer[5].g4.setTexture(LightingPass.ormMapTU, S2D.gbuffer[3]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.glowMapTU, S2D.gbuffer[4]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.envMapTU, stage.environmentMap);
+		S2D.gbuffer[5].g4.setTextureParameters(LightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, PointMipFilter);
 		S2D.gbuffer[5].g4.setMatrix(LightingPass.invVPCL, VP.inverse());
 		S2D.gbuffer[5].g4.setFloats(LightingPass.lightsDataCL, stage.lightsData);
 		S2D.gbuffer[5].g4.drawIndexedVertices();
