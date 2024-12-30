@@ -12,12 +12,11 @@ class LightingPass {
 	public static var positionMapTU:TextureUnit;
 	public static var colorMapTU:TextureUnit;
 	public static var normalMapTU:TextureUnit;
-	public static var ormMapTU:TextureUnit;
 	public static var glowMapTU:TextureUnit;
+	public static var ormMapTU:TextureUnit;
+	public static var envMapTU:TextureUnit;
 	public static var invVPCL:ConstantLocation;
-	public static var lightPosCL:ConstantLocation;
-	public static var lightColorCL:ConstantLocation;
-	public static var lightAttribCL:ConstantLocation;
+	public static var lightsDataCL:ConstantLocation;
 
 	public static function compile() {
 		var structure = new VertexStructure();
@@ -35,11 +34,10 @@ class LightingPass {
 		positionMapTU = pipeline.getTextureUnit("positionMap");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
-		ormMapTU = pipeline.getTextureUnit("ormMap");
 		glowMapTU = pipeline.getTextureUnit("glowMap");
-		invVPCL = pipeline.getConstantLocation("InvVP");
-		lightPosCL = pipeline.getConstantLocation("lightPos");
-		lightColorCL = pipeline.getConstantLocation("lightColor");
-		lightAttribCL = pipeline.getConstantLocation("lightAttrib");
+		ormMapTU = pipeline.getTextureUnit("ormMap");
+		envMapTU = pipeline.getTextureUnit("envMap");
+		invVPCL = pipeline.getConstantLocation("invVP");
+		lightsDataCL = pipeline.getConstantLocation("lightsData");
 	}
 }

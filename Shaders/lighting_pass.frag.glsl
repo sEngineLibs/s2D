@@ -1,16 +1,23 @@
 #version 450
 
+#define MAX_LIGHTS 16
+#define LIGHT_STRUCT_SIZE 8
+
+struct Light {
+    vec3 position;
+    vec3 color;
+    float power;
+    float radius;
+};
+
+uniform mat4 invVP;
+uniform float lightsData[1 + MAX_LIGHTS * LIGHT_STRUCT_SIZE];
 uniform sampler2D positionMap;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
 uniform sampler2D glowMap;
 uniform sampler2D ormMap; // [occlusion, roughness, metalness]
-
-uniform mat4 InvVP;
-
-uniform vec3 lightPos;
-uniform vec3 lightColor;
-uniform vec2 lightAttrib; // [intensity, radius]
+uniform sampler2D envMap;
 
 in vec2 fragCoord;
 in vec4 fragmentColor;
@@ -18,6 +25,22 @@ out vec4 fragColor;
 
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
 const float PI = 3.14159;
+
+Light getLight(int index) {
+    int i = 1 + index * LIGHT_STRUCT_SIZE;
+
+    Light light;
+    light.position = vec3(lightsData[i + 0],
+                          lightsData[i + 1],
+                          lightsData[i + 2]);
+    light.color = vec3(lightsData[i + 3],
+                       lightsData[i + 4],
+                       lightsData[i + 5]);
+    light.power = lightsData[i + 6];
+    light.radius = lightsData[i + 7];
+    
+    return light;
+}
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     float factor = pow(1.0 - cosTheta, 5.0);
@@ -42,29 +65,13 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
            geometrySchlickGGX(max(dot(N, L), 0.0), k);
 }
 
-void main() {
-    // fetch gbuffer textures
-    vec3 position = texture(positionMap, fragCoord).rgb;
-    vec3 normal = texture(normalMap, fragCoord).rgb;
-    vec3 color = texture(colorMap, fragCoord).rgb;
-    vec3 orm = texture(ormMap, fragCoord).rgb;
-    vec3 glow = texture(glowMap, fragCoord).rgb;
-
-    float occlusion = orm.r;
-    float roughness = orm.g;
-    float metalness = orm.b;
-    
-    // convert data
-    vec4 worldPos = InvVP * vec4(position * 2.0 - 1.0, 1.0);
-    position = worldPos.xyz / worldPos.w;
-    normal = normalize(normal * 2.0 - 1.0);
-
-    vec3 l = lightPos - position;
+vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughness, float metalness) {
+    vec3 l = light.position - position;
     float distSq = dot(l, l);
     float dist = sqrt(distSq);
     vec3 dir = l / dist;
 
-    float lightAttenuation = lightAttrib.x / (4.0 * PI * distSq + lightAttrib.y * lightAttrib.y);
+    float lightAttenuation = light.power / (4.0 * PI * distSq + light.radius * light.radius);
 
     vec3 V = normalize(viewDir);
     vec3 H = normalize(dir + V);
@@ -76,11 +83,62 @@ void main() {
     // BRDF components
     float NDF = distributionGGX(normal, H, roughness);
     float G = geometrySmith(normal, V, dir, roughness);
-    vec3 specularLight = NDF * G * F / 4.0 * dot(normal, V) * dot(normal, dir);
+    vec3 specularLight = (NDF * G * F) / 4.0 * dot(normal, V) * dot(normal, dir);
 
     // diffuse
     vec3 kD = (1.0 - F) * (1.0 - metalness);
-    vec3 diffuseLight = kD * color * dot(normal, dir) / PI;
+    vec3 diffuseLight = kD * color * max(dot(normal, dir), 0.0) / PI;
 
-    fragColor = vec4(glow + occlusion * (diffuseLight + specularLight) * lightColor * lightAttenuation, 1.0);
+    return (diffuseLight + specularLight) * light.color * lightAttenuation;
+}
+
+vec3 environmentLighting(vec3 normal, vec3 color, float roughness, float metalness) {
+    vec3 V = normalize(viewDir);
+
+    // Radiance (Specular)
+    vec3 reflection = reflect(-V, normal);
+    reflection = normalize(reflection);
+    vec3 radiance = textureLod(envMap, reflection.xy * 0.5 + 0.5, 0.0).rgb;
+
+    // Fresnel
+    vec3 F0 = mix(vec3(0.04), color, metalness);
+    vec3 F = fresnelSchlick(max(dot(normal, V), 0.0), F0);
+
+    vec3 specular = radiance * F;
+
+    // Irradiance (Diffuse)
+    vec3 diffuseIrradiance = texture(envMap, normal.xy * 0.5 + 0.5).rgb;
+    vec3 kD = (1.0 - F) * (1.0 - metalness);
+    vec3 diffuse = kD * color * diffuseIrradiance;
+
+    return diffuse + specular;
+}
+
+void main() {
+    // fetch gbuffer textures
+    vec3 position = texture(positionMap, fragCoord).rgb;
+    vec3 normal = texture(normalMap, fragCoord).rgb;
+    vec3 color = texture(colorMap, fragCoord).rgb;
+    vec3 orm = texture(ormMap, fragCoord).rgb;
+    vec3 glow = texture(glowMap, fragCoord).rgb;
+
+    float occlusion = orm.r;
+    float roughness = orm.g;
+    float metalness = orm.b;
+
+    // convert data
+    vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
+    position = worldPos.xyz / worldPos.w;
+    normal = normalize(normal * 2.0 - 1.0);
+
+    // lighting from lights
+    vec3 c = vec3(0.0);
+    int lightCount = min(int(lightsData[0]), MAX_LIGHTS);
+    for (int i = 0; i < lightCount; ++i)
+        c += lighting(getLight(i), position, normal, color, roughness, metalness);
+
+    // combine lighting
+    c = glow + occlusion * (c + environmentLighting(normal, color, roughness, metalness));
+
+    fragColor = vec4(c, 1.0);
 }

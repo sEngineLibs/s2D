@@ -44,13 +44,10 @@ class RenderPath {
 		S2D.gbuffer[5].g4.setTexture(LightingPass.colorMapTU, S2D.gbuffer[2]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.ormMapTU, S2D.gbuffer[3]);
 		S2D.gbuffer[5].g4.setTexture(LightingPass.glowMapTU, S2D.gbuffer[4]);
+		S2D.gbuffer[5].g4.setTexture(LightingPass.envMapTU, stage.environmentMap);
 		S2D.gbuffer[5].g4.setMatrix(LightingPass.invVPCL, VP.inverse());
-		for (light in stage.lights) {
-			S2D.gbuffer[5].g4.setVector3(LightingPass.lightPosCL, light.location);
-			S2D.gbuffer[5].g4.setFloat3(LightingPass.lightColorCL, light.color.R, light.color.G, light.color.B);
-			S2D.gbuffer[5].g4.setFloat2(LightingPass.lightAttribCL, light.power, light.radius);
-			S2D.gbuffer[5].g4.drawIndexedVertices();
-		}
+		S2D.gbuffer[5].g4.setFloats(LightingPass.lightsDataCL, stage.lightsData);
+		S2D.gbuffer[5].g4.drawIndexedVertices();
 		S2D.gbuffer[5].g2.end();
 
 		// postprocessing pass
@@ -70,10 +67,10 @@ class RenderPath {
 		// compositor pass
 		target.g2.begin(true, S2D.compositor.letterBoxColor);
 		target.g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
-		// target.g2.pipeline = CompositorPass.pipeline;
-		// target.g4.setPipeline(CompositorPass.pipeline);
-		// target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
-		target.g2.drawScaledImage(S2D.gbuffer[5], 0, 0, target.width, target.height);
+		target.g2.pipeline = CompositorPass.pipeline;
+		target.g4.setPipeline(CompositorPass.pipeline);
+		target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
+		target.g2.drawScaledImage(S2D.gbuffer[6], 0, 0, target.width, target.height);
 		target.g2.disableScissor();
 		target.g2.end();
 	};
