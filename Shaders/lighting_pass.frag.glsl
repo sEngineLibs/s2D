@@ -135,8 +135,9 @@ void main() {
     // lighting from lights
     vec3 c = vec3(0.0);
     int lightCount = min(int(lightsData[0]), MAX_LIGHTS);
-    for (int i = 0; i < lightCount; ++i)
+    for (int i = 0; i < lightCount; ++i) 
         c += lighting(getLight(i), position, normal, color, roughness, metalness);
+    
 
     // environment lighting
     vec3 e = envLighting(normal, color, roughness, metalness);

@@ -58,6 +58,4 @@ void main() {
     position.a = mask;
     orm.a = mask;
     glow.a = mask;
-
-    position = vec4(color.a);
 }
