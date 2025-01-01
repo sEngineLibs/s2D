@@ -1,6 +1,5 @@
 package s2d;
 
-import kha.math.FastVector4;
 import kha.Image;
 import kha.System;
 import kha.FastFloat;
@@ -31,7 +30,6 @@ class S2D {
 	@:isVar public static var resolutionScale(default, set):FastFloat = 1.0;
 
 	@:isVar public static var scale(default, set):FastFloat = 1.0;
-	@:isVar public static var distance(default, set):FastFloat = 1.0;
 	@:isVar public static var aspectRatio(default, set):FastFloat = 1.0;
 
 	public static var stage:Stage = new Stage();
@@ -126,12 +124,6 @@ class S2D {
 		return value;
 	}
 
-	static inline function set_distance(value:FastFloat):FastFloat {
-		distance = value;
-		updateProjection();
-		return value;
-	}
-
 	static inline function set_aspectRatio(value:FastFloat):FastFloat {
 		aspectRatio = value;
 		updateProjection();
@@ -140,11 +132,11 @@ class S2D {
 
 	static inline function updateProjection() {
 		if (aspectRatio >= 1)
-			projection = FastMatrix4.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale, 0.0, distance);
+			projection = FastMatrix4.orthogonalProjection(-scale * aspectRatio, scale * aspectRatio, -scale, scale, 0.0, scale);
 		else
-			projection = FastMatrix4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, distance);
+			projection = FastMatrix4.orthogonalProjection(-scale, scale, -scale / aspectRatio, scale / aspectRatio, 0.0, scale);
 
-		projection.setScaleZ(-1.0);
+		projection = projection.multmat(FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: -1.0}, {x: 0.0, y: 1.0, z: 0.0}));
 	}
 
 	public static inline function local2WorldSpace(point:FastVector3):FastVector3 {

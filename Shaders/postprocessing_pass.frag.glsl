@@ -1,5 +1,9 @@
 #version 450
 
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 uniform sampler2D textureMap;
 uniform sampler2D positionMap;
 
@@ -26,8 +30,8 @@ out vec4 fragColor;
 
 vec3 blur(sampler2D tex, vec2 uv, float size) {
     vec3 col = vec3(0.0);
-    for (float y = -1.0; y <= 1.0; y += 1.0 / blurQuality) 
-        for (float x = -1.0; x <= 1.0; x += 1.0 / blurQuality) 
+    for (float y = -1.0; y <= 1.0; y += 1.0 / blurQuality)
+        for (float x = -1.0; x <= 1.0; x += 1.0 / blurQuality)
             col += texture(tex, uv + vec2(x, y) * size).rgb;
     return col / blurWeight;
 }
@@ -41,6 +45,7 @@ void main() {
     float dofSize = Params[1];
     vec2 mistScale = vec2(Params[2], Params[3]);
     vec4 mistColor = vec4(Params[4], Params[5], Params[6], Params[7]);
+    float alpha = Params[8];
 
     // adjust position
     position = normalize(InvVP * vec4(position * 2.0 - 1.0, 1.0)).xyz;
@@ -55,5 +60,5 @@ void main() {
     float mist = mistScale.x + cameraDist * (mistScale.y - mistScale.x);
     color += mistColor.rgb * mistColor.a * mist;
 
-    fragColor = vec4(color, Params[8]);
+    fragColor = vec4(color, alpha);
 }

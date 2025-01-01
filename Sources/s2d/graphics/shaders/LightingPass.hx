@@ -20,7 +20,7 @@ class LightingPass {
 
 	public static function compile() {
 		var structure = new VertexStructure();
-		structure.add("vertPos", Float32_2X);
+		structure.add("vertCoord", Float32_2X);
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];

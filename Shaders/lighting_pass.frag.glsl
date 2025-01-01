@@ -1,5 +1,9 @@
 #version 450
 
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 #define MAX_LIGHTS 16
 #define LIGHT_STRUCT_SIZE 8
 

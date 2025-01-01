@@ -1,6 +1,5 @@
 package s2d.objects;
 
-import kha.math.FastVector3;
 import kha.math.FastMatrix4;
 
 // s2d
@@ -9,7 +8,6 @@ using s2d.utils.FastMatrix4Ext;
 class Object {
 	@:isVar public var parent(default, null):Object = null;
 	@:isVar public var children(default, null):Array<Object> = [];
-	public var location:FastVector3 = {};
 	public var transformation:FastMatrix4 = FastMatrix4.identity();
 	public var finalTransformation(get, never):FastMatrix4;
 

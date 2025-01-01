@@ -1,17 +1,20 @@
 package s2d;
 
 import kha.Image;
-import kha.arrays.Float32Array;
 import kha.math.FastMatrix4;
+import kha.arrays.Float32Array;
 // s2d
 import s2d.objects.Light;
 import s2d.objects.Sprite;
+import s2d.objects.Object;
+
+using s2d.utils.FastMatrix4Ext;
 
 @:allow(s2d.graphics.RenderPath)
 class Stage {
 	public var sprites:Array<Sprite> = [];
 	public var lights:Array<Light> = [];
-	public var camera:FastMatrix4;
+	public var camera:Object = new Object();
 	public var viewProjection(get, null):FastMatrix4;
 	@:isVar public var environmentMap(default, set):Image;
 
@@ -20,11 +23,10 @@ class Stage {
 	@:isVar var lightsData(get, null):Float32Array;
 
 	inline function get_viewProjection() {
-		return S2D.projection.multmat(camera);
+		return S2D.projection.multmat(camera.finalTransformation);
 	}
 
 	public inline function new() {
-		camera = FastMatrix4.lookAt({x: 0.0, y: 0.0, z: 0.0}, {x: 0.0, y: 0.0, z: -1.0}, {x: 0.0, y: 1.0, z: 0.0});
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
 	}
 
@@ -34,10 +36,11 @@ class Stage {
 		for (i in 0...lights.length) {
 			var ind = 1 + i * lightStructSize;
 			var light = lights[i];
+			var lightPosition = light.finalTransformation.getTranslation();
 
-			lightsData[ind + 0] = light.location.x;
-			lightsData[ind + 1] = light.location.y;
-			lightsData[ind + 2] = light.location.z;
+			lightsData[ind + 0] = lightPosition.x;
+			lightsData[ind + 1] = lightPosition.y;
+			lightsData[ind + 2] = lightPosition.z;
 			lightsData[ind + 3] = light.color.R;
 			lightsData[ind + 4] = light.color.G;
 			lightsData[ind + 5] = light.color.B;

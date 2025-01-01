@@ -1,5 +1,9 @@
 #version 450
 
+#ifdef GL_ES
+precision mediump float;
+#endif
+
 uniform vec4 rot;
 uniform sampler2D normalMap;
 uniform sampler2D colorMap;
@@ -35,7 +39,7 @@ void main() {
     orm = texture(ormMap, fragUV);
     glow = texture(glowMap, fragUV) * glowStrength;
 
-    // tangent space -> world space    
+    // tangent space -> world space
     normal.x = (rot.x * n.x + rot.z * n.y) * 0.5 + 0.5;
     normal.y = (rot.y * n.x + rot.w * n.y) * 0.5 + 0.5;
     normal.z = 1.0;
@@ -45,11 +49,11 @@ void main() {
     // opaque
     if (blendMode == 0) {
         color.a = mask;
-    // alpha clip
-    } else if (blendMode == 1) { 
+        // alpha clip
+    } else if (blendMode == 1) {
         mask = smoothstep(0.49, 0.51, color.a);
         color.a = mask;
-    // alpha blend
+        // alpha blend
     } else {
         mask = smoothstep(0.00, 0.01, color.a);
     }

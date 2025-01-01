@@ -1,6 +1,7 @@
 package s2d.utils;
 
 import kha.FastFloat;
+import kha.math.FastVector3;
 import kha.math.FastMatrix4;
 
 using s2d.utils.FastMatrix4Ext;
@@ -28,6 +29,20 @@ class FastMatrix4Ext {
 
 	public static inline function setTranslationZ(m:FastMatrix4, value:FastFloat) {
 		m._32 = value;
+	}
+
+	public static inline function getTranslation(m:FastMatrix4):FastVector3 {
+		return {
+			x: m.getTranslationX(),
+			y: m.getTranslationY(),
+			z: m.getTranslationZ()
+		};
+	}
+
+	public static inline function setTranslation(m:FastMatrix4, value:FastVector3):Void {
+		m.setTranslationX(value.x);
+		m.setTranslationY(value.y);
+		m.setTranslationZ(value.z);
 	}
 
 	public static inline function getScaleX(m:FastMatrix4) {
@@ -61,6 +76,20 @@ class FastMatrix4Ext {
 		m._02 *= value / sz;
 		m._12 *= value / sz;
 		m._22 *= value / sz;
+	}
+
+	public static inline function getScale(m:FastMatrix4):FastVector3 {
+		return {
+			x: m.getScaleX(),
+			y: m.getScaleY(),
+			z: m.getScaleZ()
+		};
+	}
+
+	public static inline function setScale(m:FastMatrix4, value:FastVector3):Void {
+		m.setScaleX(value.x);
+		m.setScaleY(value.y);
+		m.setScaleZ(value.z);
 	}
 
 	public static inline function getRotation(m:FastMatrix4) {

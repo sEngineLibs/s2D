@@ -12,67 +12,84 @@ using s2d.utils.FastMatrix4Ext;
 
 class RenderPath {
 	public static inline function render(target:Canvas, stage:Stage):Void {
+		var g2:kha.graphics2.Graphics, g4:kha.graphics4.Graphics;
 		var VP = stage.viewProjection;
 
+		g4 = S2D.gbuffer[0].g4;
 		// geometry pass
-		S2D.gbuffer[0].g4.begin([S2D.gbuffer[1], S2D.gbuffer[2], S2D.gbuffer[3], S2D.gbuffer[4]]);
-		S2D.gbuffer[0].g4.clear(Black);
-		S2D.gbuffer[0].g4.setPipeline(GeometryPass.pipeline);
-		S2D.gbuffer[0].g4.setIndexBuffer(Sprite.indices);
+		g4.begin([S2D.gbuffer[1], S2D.gbuffer[2], S2D.gbuffer[3], S2D.gbuffer[4]]);
+		g4.clear(Black);
+		g4.setPipeline(GeometryPass.pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
 		for (sprite in stage.sprites) {
 			var t = sprite.finalTransformation;
 
-			S2D.gbuffer[0].g4.setFloat4(GeometryPass.rotCL, t._00, t._01, t._10, t._11);
-			S2D.gbuffer[0].g4.setMatrix(GeometryPass.mvpCL, VP.multmat(t));
-			S2D.gbuffer[0].g4.setTexture(GeometryPass.colorMapTU, sprite.material.colorMap);
-			S2D.gbuffer[0].g4.setTexture(GeometryPass.normalMapTU, sprite.material.normalMap);
-			S2D.gbuffer[0].g4.setTexture(GeometryPass.ormMapTU, sprite.material.ormMap);
-			S2D.gbuffer[0].g4.setTexture(GeometryPass.glowMapTU, sprite.material.glowMap);
-			S2D.gbuffer[0].g4.setFloats(GeometryPass.paramsCL, sprite.material.params);
-			S2D.gbuffer[0].g4.setVertexBuffer(Sprite.vertices);
-			S2D.gbuffer[0].g4.drawIndexedVertices();
+			g4.setFloat4(GeometryPass.rotCL, t._00, t._01, t._10, t._11);
+			g4.setMatrix(GeometryPass.mvpCL, VP.multmat(t));
+			g4.setTexture(GeometryPass.colorMapTU, sprite.material.colorMap);
+			g4.setTexture(GeometryPass.normalMapTU, sprite.material.normalMap);
+			g4.setTexture(GeometryPass.ormMapTU, sprite.material.ormMap);
+			g4.setTexture(GeometryPass.glowMapTU, sprite.material.glowMap);
+			g4.setFloats(GeometryPass.paramsCL, sprite.material.params);
+			g4.drawIndexedVertices();
 		}
-		S2D.gbuffer[0].g4.end();
+		g4.end();
 
+		g2 = S2D.gbuffer[5].g2;
+		g4 = S2D.gbuffer[5].g4;
 		// lighting pass
-		S2D.gbuffer[5].g2.begin();
-		S2D.gbuffer[5].g4.setPipeline(LightingPass.pipeline);
-		S2D.gbuffer[5].g4.setIndexBuffer(Sprite.indices);
-		S2D.gbuffer[5].g4.setVertexBuffer(Sprite.vertices);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.positionMapTU, S2D.gbuffer[0]);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.normalMapTU, S2D.gbuffer[1]);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.colorMapTU, S2D.gbuffer[2]);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.ormMapTU, S2D.gbuffer[3]);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.glowMapTU, S2D.gbuffer[4]);
-		S2D.gbuffer[5].g4.setTexture(LightingPass.envMapTU, stage.environmentMap);
-		S2D.gbuffer[5].g4.setTextureParameters(LightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, PointMipFilter);
-		S2D.gbuffer[5].g4.setMatrix(LightingPass.invVPCL, VP.inverse());
-		S2D.gbuffer[5].g4.setFloats(LightingPass.lightsDataCL, stage.lightsData);
-		S2D.gbuffer[5].g4.drawIndexedVertices();
-		S2D.gbuffer[5].g2.end();
+		g2.begin();
+		g4.setPipeline(LightingPass.pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
+		g4.setTexture(LightingPass.positionMapTU, S2D.gbuffer[0]);
+		g4.setTexture(LightingPass.normalMapTU, S2D.gbuffer[1]);
+		g4.setTexture(LightingPass.colorMapTU, S2D.gbuffer[2]);
+		g4.setTexture(LightingPass.ormMapTU, S2D.gbuffer[3]);
+		g4.setTexture(LightingPass.glowMapTU, S2D.gbuffer[4]);
+		g4.setTexture(LightingPass.envMapTU, stage.environmentMap);
+		g4.setTextureParameters(LightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, PointMipFilter);
+		g4.setMatrix(LightingPass.invVPCL, VP.inverse());
+		g4.setFloats(LightingPass.lightsDataCL, stage.lightsData);
+		g4.drawIndexedVertices();
+		g2.end();
 
+		g2 = S2D.gbuffer[6].g2;
+		g4 = S2D.gbuffer[6].g4;
 		// postprocessing pass
-		S2D.gbuffer[6].g2.begin(false);
-		S2D.gbuffer[6].g4.setPipeline(PostProcessingPass.pipeline);
-		S2D.gbuffer[6].g4.setIndexBuffer(Sprite.indices);
-		S2D.gbuffer[6].g4.setVertexBuffer(Sprite.vertices);
-		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.positionMapTU, S2D.gbuffer[0]);
-		S2D.gbuffer[6].g4.setTexture(PostProcessingPass.textureMapTU, S2D.gbuffer[5]);
-		S2D.gbuffer[6].g4.setFloats(PostProcessingPass.paramsCL, S2D.postProcessing.params);
-		S2D.gbuffer[6].g4.setMatrix(PostProcessingPass.invVPCL, VP.inverse());
-		S2D.gbuffer[6].g4.setFloat3(PostProcessingPass.cameraPosCL, stage.camera.getTranslationX(), stage.camera.getTranslationY(),
-			stage.camera.getTranslationZ());
-		S2D.gbuffer[6].g4.drawIndexedVertices();
-		S2D.gbuffer[6].g2.end();
+		var cameraPosition = stage.camera.finalTransformation.getTranslation();
+		g2.begin(false);
+		g4.setPipeline(PostProcessingPass.pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
+		g4.setTexture(PostProcessingPass.positionMapTU, S2D.gbuffer[0]);
+		g4.setTexture(PostProcessingPass.textureMapTU, S2D.gbuffer[5]);
+		g4.setFloats(PostProcessingPass.paramsCL, S2D.postProcessing.params);
+		g4.setMatrix(PostProcessingPass.invVPCL, VP.inverse());
+		g4.setVector3(PostProcessingPass.cameraPosCL, cameraPosition);
+		g4.drawIndexedVertices();
+		g2.end();
 
+		g2 = S2D.gbuffer[5].g2;
+		g4 = S2D.gbuffer[5].g4;
 		// compositor pass
-		target.g2.begin(true, S2D.compositor.letterBoxColor);
-		target.g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
-		target.g2.pipeline = CompositorPass.pipeline;
-		target.g4.setPipeline(CompositorPass.pipeline);
-		target.g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
-		target.g2.drawScaledImage(S2D.gbuffer[6], 0, 0, target.width, target.height);
-		target.g2.disableScissor();
-		target.g2.end();
+		g2.begin();
+		g4.clear(S2D.compositor.letterBoxColor);
+		g4.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
+		g4.setPipeline(CompositorPass.pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
+		g4.setTexture(CompositorPass.textureMapTU, S2D.gbuffer[6]);
+		g4.setFloat2(CompositorPass.resolutionCL, S2D.gbuffer[6].width, S2D.gbuffer[6].height);
+		g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
+		g4.drawIndexedVertices();
+		g4.disableScissor();
+		g2.end();
+
+		g2 = target.g2;
+		g2.begin();
+		g2.drawImage(S2D.gbuffer[5], 0, 0);
+		g2.end();
 	};
 }
