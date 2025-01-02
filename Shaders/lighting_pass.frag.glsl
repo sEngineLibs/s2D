@@ -24,7 +24,6 @@ uniform sampler2D ormMap; // [occlusion, roughness, metalness]
 uniform sampler2D envMap;
 
 in vec2 fragCoord;
-in vec4 fragmentColor;
 out vec4 fragColor;
 
 const vec3 viewDir = vec3(0.0, 0.0, 1.0); // 2D
@@ -35,14 +34,14 @@ Light getLight(int index) {
 
     Light light;
     light.position = vec3(lightsData[i + 0],
-                          lightsData[i + 1],
-                          lightsData[i + 2]);
+            lightsData[i + 1],
+            lightsData[i + 2]);
     light.color = vec3(lightsData[i + 3],
-                       lightsData[i + 4],
-                       lightsData[i + 5]);
+            lightsData[i + 4],
+            lightsData[i + 5]);
     light.power = lightsData[i + 6];
     light.radius = lightsData[i + 7];
-    
+
     return light;
 }
 
@@ -66,7 +65,7 @@ float geometrySchlickGGX(float NdotX, float k) {
 float geometrySmith(vec3 N, vec3 V, vec3 L, float roughnessE2) {
     float k = roughnessE2 * 0.5;
     return geometrySchlickGGX(max(dot(N, V), 0.0), k) *
-           geometrySchlickGGX(max(dot(N, L), 0.0), k);
+        geometrySchlickGGX(max(dot(N, L), 0.0), k);
 }
 
 vec3 lighting(Light light, vec3 position, vec3 normal, vec3 color, float roughness, float metalness) {
@@ -139,9 +138,8 @@ void main() {
     // lighting from lights
     vec3 c = vec3(0.0);
     int lightCount = min(int(lightsData[0]), MAX_LIGHTS);
-    for (int i = 0; i < lightCount; ++i) 
+    for (int i = 0; i < lightCount; ++i)
         c += lighting(getLight(i), position, normal, color, roughness, metalness);
-    
 
     // environment lighting
     vec3 e = envLighting(normal, color, roughness, metalness);

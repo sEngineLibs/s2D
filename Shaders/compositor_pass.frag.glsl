@@ -20,7 +20,9 @@ uniform vec2 resolution;
 // 10 - convolution filter 20
 // 11 - convolution filter 21
 // 12 - convolution filter 22
-uniform float Params[13];
+// 13 - posterize gamma
+// 14 - posterize n.o. steps
+uniform float Params[15];
 
 in vec2 fragCoord;
 out vec4 fragColor;
@@ -62,6 +64,13 @@ vec3 convolve3x3(sampler2D tex, vec2 texelSize, vec2 coord, mat3 mat) {
     return col;
 }
 
+vec3 posterize(vec3 col, float gamma, float steps) {
+    col = pow(col, vec3(gamma));
+    col = floor(col * steps) / steps;
+    col = pow(col, vec3(1.0 / gamma));
+    return col;
+}
+
 float vignette(vec2 coord, float strength, vec2 resolution) {
     vec2 center = resolution * 0.5;
     float normalizedDist = distance(coord, center) / distance(vec2(0.0), center);
@@ -81,15 +90,18 @@ void main() {
             Params[7], Params[8], Params[9],
             Params[10], Params[11], Params[12]
         );
+    float posterizeGamma = Params[13];
+    float posterizeSteps = Params[14];
 
     // uv distortion goes first
     vec2 UV = fragCoord;
     UV = fisheyeUV(UV, distortionPos, distortion, ratio);
 
     vec3 col = convolve3x3(textureMap, vec2(1.0) / resolution, UV, convFilter);
-
+    col = posterize(col, posterizeGamma, posterizeSteps);
+    
     // vignette
-    col *= vignette(fragCoord, vignetteStrength, resolution);
+    // col *= vignette(fragCoord, vignetteStrength, resolution);
 
     fragColor = vec4(col, 1.0);
 }

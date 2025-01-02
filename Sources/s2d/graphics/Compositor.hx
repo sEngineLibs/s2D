@@ -15,15 +15,19 @@ class Compositor {
 	public var vignetteStrength(get, set):FastFloat;
 	public var distortionPosition(get, set):FastVector2;
 	public var distortion(get, set):FastFloat;
-	public var filter(get, set):FastMatrix3;
+	public var filter(get, set):Filter;
+	public var posterizeGamma(get, set):FastFloat;
+	public var posterizeSteps(get, set):FastFloat;
 
 	public inline function new() {
-		params = new Float32Array(13);
+		params = new Float32Array(15);
 
 		distortion = 0.0;
 		distortionPosition = {x: 0.5, y: 0.5};
 		vignetteStrength = 0.0;
-		filter = Filter.NoFilter;
+		filter = Filter.Identity;
+		posterizeGamma = 1.0;
+		posterizeSteps = 255.0;
 	}
 
 	inline function get_distortionPosition():FastVector2 {
@@ -57,20 +61,39 @@ class Compositor {
 		return value;
 	}
 
-	inline function get_filter():FastMatrix3 {
+	inline function get_filter():Filter {
 		return new FastMatrix3(params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12]);
 	}
 
-	inline function set_filter(value:FastMatrix3):FastMatrix3 {
-		params[4] = value._00;
-		params[5] = value._01;
-		params[6] = value._02;
-		params[7] = value._10;
-		params[8] = value._11;
-		params[9] = value._12;
-		params[10] = value._20;
-		params[11] = value._21;
-		params[12] = value._22;
+	inline function set_filter(value:Filter):Filter {
+		var f:FastMatrix3 = value;
+		params[4] = f._00;
+		params[5] = f._01;
+		params[6] = f._02;
+		params[7] = f._10;
+		params[8] = f._11;
+		params[9] = f._12;
+		params[10] = f._20;
+		params[11] = f._21;
+		params[12] = f._22;
+		return value;
+	}
+
+	inline function get_posterizeGamma():FastFloat {
+		return params[13];
+	}
+
+	inline function set_posterizeGamma(value:FastFloat):FastFloat {
+		params[13] = value;
+		return value;
+	}
+
+	inline function get_posterizeSteps():FastFloat {
+		return params[14];
+	}
+
+	inline function set_posterizeSteps(value:FastFloat):FastFloat {
+		params[14] = value;
 		return value;
 	}
 }

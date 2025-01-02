@@ -4,16 +4,16 @@
 precision mediump float;
 #endif
 
-uniform vec4 rot;
-uniform sampler2D normalMap;
+uniform mat4 model;
+uniform mat4 viewProjection;
+
 uniform sampler2D colorMap;
+uniform sampler2D normalMap;
 uniform sampler2D ormMap;
 uniform sampler2D glowMap;
 
-// 0 - blend mode
 // 1 - depth scale
-// 2 - glow strength
-uniform float Params[3];
+uniform float Params[1];
 
 in vec3 fragPos;
 in vec2 fragUV;
@@ -26,40 +26,39 @@ layout(location = 4) out vec4 glow;
 
 void main() {
     // fetch material parameters
-    int blendMode = int(Params[0]);
-    float depthScale = Params[1];
-    float glowStrength = Params[2];
+    float depthScale = Params[0];
+
+    vec3 s = vec3(viewProjection[0][2], viewProjection[1][2], viewProjection[2][2]);
+    float scaleZ = sqrt(s.x * s.x + s.y * s.y + s.z * s.z);
+
+    float rot = atan(model[1][0], model[0][0]);
+    float rotSin = sin(rot);
+    float rotCos = cos(rot);
 
     // fetch material textures
-    vec3 n = texture(normalMap, fragUV).rgb;
-    n.xy = n.xy * 2.0 - 1.0;
-    position = vec4(fragPos, 1.0);
-    position.z += (n.z) * depthScale;
     color = texture(colorMap, fragUV);
     orm = texture(ormMap, fragUV);
-    glow = texture(glowMap, fragUV) * glowStrength;
+    glow = texture(glowMap, fragUV);
+    normal = texture(normalMap, fragUV);
+
+    // convert data
+    position = vec4(fragPos, 1.0);
+    position.z += normal.z * depthScale / scaleZ;
 
     // tangent space -> world space
-    normal.x = (rot.x * n.x + rot.z * n.y) * 0.5 + 0.5;
-    normal.y = (rot.y * n.x + rot.w * n.y) * 0.5 + 0.5;
-    normal.z = 1.0;
+    vec2 n = normal.xy * 2.0 - 1.0;
+    normal.x = rotCos * n.x + rotSin * n.y;
+    normal.y = -rotSin * n.x + rotCos * n.y;
+    normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
+    normal = normal * 0.5 + 0.5;
 
-    // apply blend mode
-    float mask = 1.0;
-    // opaque
-    if (blendMode == 0) {
-        color.a = mask;
-        // alpha clip
-    } else if (blendMode == 1) {
-        mask = smoothstep(0.49, 0.51, color.a);
-        color.a = mask;
-        // alpha blend
-    } else {
-        mask = smoothstep(0.00, 0.01, color.a);
-    }
-
-    normal.a = mask;
-    position.a = mask;
-    orm.a = mask;
-    glow.a = mask;
+    // premultiply alpha
+    normal.rgb *= color.a;
+    normal.a = color.a;
+    position.rgb *= color.a;
+    position.a = color.a;
+    orm.rgb *= color.a;
+    orm.a = color.a;
+    glow.rgb *= color.a;
+    glow.a = color.a;
 }

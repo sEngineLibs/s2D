@@ -23,10 +23,8 @@ class RenderPath {
 		g4.setIndexBuffer(Sprite.indices);
 		g4.setVertexBuffer(Sprite.vertices);
 		for (sprite in stage.sprites) {
-			var t = sprite.finalTransformation;
-
-			g4.setFloat4(GeometryPass.rotCL, t._00, t._01, t._10, t._11);
-			g4.setMatrix(GeometryPass.mvpCL, VP.multmat(t));
+			g4.setMatrix(GeometryPass.modelCL, sprite.finalTransformation);
+			g4.setMatrix(GeometryPass.viewProjectionCL, VP);
 			g4.setTexture(GeometryPass.colorMapTU, sprite.material.colorMap);
 			g4.setTexture(GeometryPass.normalMapTU, sprite.material.normalMap);
 			g4.setTexture(GeometryPass.ormMapTU, sprite.material.ormMap);
@@ -76,7 +74,6 @@ class RenderPath {
 		// compositor pass
 		g2.begin();
 		g4.clear(S2D.compositor.letterBoxColor);
-		g4.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
 		g4.setPipeline(CompositorPass.pipeline);
 		g4.setIndexBuffer(Sprite.indices);
 		g4.setVertexBuffer(Sprite.vertices);
@@ -84,12 +81,13 @@ class RenderPath {
 		g4.setFloat2(CompositorPass.resolutionCL, S2D.gbuffer[6].width, S2D.gbuffer[6].height);
 		g4.setFloats(CompositorPass.paramsCL, S2D.compositor.params);
 		g4.drawIndexedVertices();
-		g4.disableScissor();
 		g2.end();
 
 		g2 = target.g2;
 		g2.begin();
-		g2.drawImage(S2D.gbuffer[5], 0, 0);
+		g2.scissor(0, S2D.compositor.letterBoxHeight, target.width, target.height - S2D.compositor.letterBoxHeight * 2);
+		g2.drawScaledImage(S2D.gbuffer[5], 0, 0, target.width, target.height);
+		g2.disableScissor();
 		g2.end();
 	};
 }

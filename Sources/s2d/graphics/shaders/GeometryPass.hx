@@ -9,8 +9,8 @@ import kha.graphics4.ConstantLocation;
 class GeometryPass {
 	public static var pipeline:PipelineState;
 
-	public static var rotCL:ConstantLocation;
-	public static var mvpCL:ConstantLocation;
+	public static var modelCL:ConstantLocation;
+	public static var viewProjectionCL:ConstantLocation;
 	public static var colorMapTU:TextureUnit;
 	public static var normalMapTU:TextureUnit;
 	public static var ormMapTU:TextureUnit;
@@ -26,14 +26,14 @@ class GeometryPass {
 		pipeline.inputLayout = [structure];
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
-		pipeline.blendSource = SourceAlpha;
+		pipeline.blendSource = BlendOne;
 		pipeline.blendDestination = InverseSourceAlpha;
 		pipeline.vertexShader = Shaders.geometry_pass_vert;
 		pipeline.fragmentShader = Shaders.geometry_pass_frag;
 		pipeline.compile();
 
-		rotCL = pipeline.getConstantLocation("rot");
-		mvpCL = pipeline.getConstantLocation("MVP");
+		modelCL = pipeline.getConstantLocation("model");
+		viewProjectionCL = pipeline.getConstantLocation("viewProjection");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");

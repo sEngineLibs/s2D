@@ -11,41 +11,19 @@ class Material {
 	public var glowMap:Image;
 
 	public var params:Float32Array;
-	public var blendMode(get, set):BlendMode;
 	public var depthScale(get, set):FastFloat;
-	public var glowStrength(get, set):FastFloat;
 
 	public inline function new() {
-		params = new Float32Array(3);
-		blendMode = AlphaClip;
+		params = new Float32Array(1);
 		depthScale = 0.0;
-		glowStrength = 1.0;
-	}
-
-	inline function get_blendMode():BlendMode {
-		return Std.int(params[0]);
-	}
-
-	inline function set_blendMode(value:BlendMode):BlendMode {
-		params[0] = value;
-		return value;
 	}
 
 	inline function get_depthScale():FastFloat {
-		return params[1];
+		return params[0];
 	}
 
 	inline function set_depthScale(value:FastFloat):FastFloat {
-		params[1] = value;
-		return value;
-	}
-
-	inline function get_glowStrength():FastFloat {
-		return params[2];
-	}
-
-	inline function set_glowStrength(value:FastFloat):FastFloat {
-		params[2] = value;
+		params[0] = value;
 		return value;
 	}
 }

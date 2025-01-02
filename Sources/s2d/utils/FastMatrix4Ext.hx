@@ -45,7 +45,7 @@ class FastMatrix4Ext {
 		m.setTranslationZ(value.z);
 	}
 
-	public static inline function getScaleX(m:FastMatrix4) {
+	public static inline function getScaleX(m:FastMatrix4):FastFloat {
 		return Math.sqrt(m._00 * m._00 + m._10 * m._10 + m._20 * m._20);
 	}
 
@@ -56,7 +56,7 @@ class FastMatrix4Ext {
 		m._20 *= value / sx;
 	}
 
-	public static inline function getScaleY(m:FastMatrix4) {
+	public static inline function getScaleY(m:FastMatrix4):FastFloat {
 		return Math.sqrt(m._01 * m._01 + m._11 * m._11 + m._21 * m._21);
 	}
 
@@ -67,11 +67,11 @@ class FastMatrix4Ext {
 		m._21 *= value / sy;
 	}
 
-	public static inline function getScaleZ(m:FastMatrix4) {
+	public static inline function getScaleZ(m:FastMatrix4):FastFloat {
 		return Math.sqrt(m._02 * m._02 + m._12 * m._12 + m._22 * m._22);
 	}
 
-	public static inline function setScaleZ(m:FastMatrix4, value:FastFloat) {
+	public static inline function setScaleZ(m:FastMatrix4, value:FastFloat):Void {
 		var sz = m.getScaleZ();
 		m._02 *= value / sz;
 		m._12 *= value / sz;
@@ -92,11 +92,11 @@ class FastMatrix4Ext {
 		m.setScaleZ(value.z);
 	}
 
-	public static inline function getRotation(m:FastMatrix4) {
+	public static inline function getRotation(m:FastMatrix4):FastFloat {
 		return Math.atan2(m._10, m._00) * 180 / Math.PI;
 	}
 
-	public static inline function setRotation(m:FastMatrix4, value:FastFloat) {
+	public static inline function setRotation(m:FastMatrix4, value:FastFloat):Void {
 		var angle = value * Math.PI / 180;
 		var sx = getScaleX(m);
 		var sy = getScaleY(m);
@@ -109,16 +109,16 @@ class FastMatrix4Ext {
 		m._11 = ca * sy;
 	}
 
-	public static inline function rotate(m:FastMatrix4, angle:FastFloat) {
+	public static inline function rotate(m:FastMatrix4, angle:FastFloat):Void {
 		m.setRotation(m.getRotation() + angle);
 	}
 
-	public static inline function scale(m:FastMatrix4, x:FastFloat, y:FastFloat) {
+	public static inline function scale(m:FastMatrix4, x:FastFloat, y:FastFloat):Void {
 		m.setScaleX(m.getScaleX() * x);
 		m.setScaleY(m.getScaleY() * y);
 	}
 
-	public static inline function translate(m:FastMatrix4, x:FastFloat, y:FastFloat, ?z:FastFloat = 0) {
+	public static inline function translate(m:FastMatrix4, x:FastFloat, y:FastFloat, ?z:FastFloat = 0):Void {
 		m.setTranslationX(m.getTranslationX() + x);
 		m.setTranslationY(m.getTranslationY() + y);
 		m.setTranslationZ(m.getTranslationZ() + z);
