@@ -26,7 +26,7 @@ class PostProcessing {
 	public static var mist:Mist = {
 		near: 0.0,
 		far: 1.0,
-		color: Color.fromFloats(0.0, 0.0, 0.0, 0.0)
+		color: White
 	};
 	public static var fisheye:Fisheye = {
 		position: {x: 0.5, y: 0.5},

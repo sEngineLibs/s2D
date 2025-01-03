@@ -62,12 +62,13 @@ class RenderPath {
 
 	static inline function render(target:Canvas, stage:Stage):Void {
 		var g2:kha.graphics2.Graphics, g4:kha.graphics4.Graphics;
+		var sourceInd:Int = 0, targetInd:Int = 0;
 
 		var VP = stage.viewProjection;
 		var cameraPos = stage.camera.finalTransformation.getTranslation();
 
 		// geometry pass
-		g4 = gbuffer[0].g4;
+		g4 = gbuffer[targetInd].g4;
 		g4.begin([gbuffer[1], gbuffer[2], gbuffer[3], gbuffer[4]]);
 		g4.clear(Black);
 		g4.setPipeline(geometryPass.pipeline);
@@ -84,10 +85,12 @@ class RenderPath {
 			g4.drawIndexedVertices();
 		}
 		g4.end();
+		sourceInd = 0;
+		targetInd = 5;
 
 		// lighting pass
-		g2 = gbuffer[5].g2;
-		g4 = gbuffer[5].g4;
+		g2 = gbuffer[targetInd].g2;
+		g4 = gbuffer[targetInd].g4;
 		g2.begin();
 		g4.setPipeline(lightingPass.pipeline);
 		g4.setIndexBuffer(Sprite.indices);
@@ -103,46 +106,52 @@ class RenderPath {
 		g4.setFloats(lightingPass.lightsDataCL, stage.lightsData);
 		g4.drawIndexedVertices();
 		g2.end();
+		sourceInd = 5;
+		targetInd = 6;
 
 		// postprocessing
 		var invVP = VP.inverse();
 
-		// var mist = PostProcessing.mist;
-		// PostProcessing.mistPass.render(gbuffer[6], Sprite.indices, Sprite.vertices, [
-		// 	gbuffer[5],
-		// 	// uniforms
-		// 	gbuffer[0],
-		// 	invVP,
-		// 	cameraPos,
-		// 	mist.near,
-		// 	mist.far,
-		// 	mist.color.R,
-		// 	mist.color.G,
-		// 	mist.color.B,
-		// 	mist.color.A
-		// ]);
+		var mist = PostProcessing.mist;
+		PostProcessing.mistPass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
+			gbuffer[sourceInd],
+			// uniforms
+			gbuffer[0],
+			invVP,
+			cameraPos,
+			mist.near,
+			mist.far,
+			mist.color.R,
+			mist.color.G,
+			mist.color.B,
+			mist.color.A
+		]);
+		sourceInd = 6;
+		targetInd = 5;
 
-		// var dof = PostProcessing.dof;
-		// PostProcessing.dofPass.render(gbuffer[5], Sprite.indices, Sprite.vertices, [
-		// 	gbuffer[6],
-		// 	// uniforms
-		// 	gbuffer[0],
-		// 	invVP,
-		// 	cameraPos,
-		// 	dof.focusDistance,
-		// 	dof.blurSize
-		// ]);
+		var dof = PostProcessing.dof;
+		PostProcessing.dofPass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
+			gbuffer[sourceInd],
+			// uniforms
+			gbuffer[0],
+			invVP,
+			cameraPos,
+			dof.focusDistance,
+			dof.blurSize
+		]);
+		sourceInd = 5;
+		targetInd = 6;
 
 		var fisheye = PostProcessing.fisheye;
-		PostProcessing.fisheyePass.render(gbuffer[6], Sprite.indices, Sprite.vertices, [
-			gbuffer[5],
+		PostProcessing.fisheyePass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
+			gbuffer[sourceInd],
 			// uniforms
 			fisheye.position,
 			fisheye.strength
 		]);
+		sourceInd = 6;
+		targetInd = 5;
 
-		var sourceInd = 6;
-		var targetInd = 5;
 		for (i in 0...PostProcessing.filters.length) {
 			sourceInd = 5 + (i + 1) % 2;
 			targetInd = 5 + i % 2;

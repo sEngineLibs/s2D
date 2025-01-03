@@ -4,7 +4,7 @@ import kha.math.FastMatrix3;
 
 abstract Filter(FastMatrix3) from FastMatrix3 to FastMatrix3 {
 	public static var Identity = new FastMatrix3(0, 0, 0, 0, 1, 0, 0, 0, 0);
-	public static var Sharpen = new FastMatrix3(-0.0023, -0.0432, -0.0023, -0.0432, 1.182, -0.0432, -0.0023, -0.0432, -0.0023);
+	public static var Sharpen = new FastMatrix3(0, -1, 0, -1, 5, -1, 0, -1, 0);
 	public static var BoxBlur = new FastMatrix3(0.111, 0.111, 0.111, 0.112, 0.111, 0.111, 0.111, 0.111, 0.111);
 	public static var GaussianBlur = new FastMatrix3(0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625);
 	public static var EdgeDetectionVertical = new FastMatrix3(-1, 0, 1, -2, 0, 2, -1, 0, 1);

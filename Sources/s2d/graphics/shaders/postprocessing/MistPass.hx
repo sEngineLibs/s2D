@@ -24,7 +24,7 @@ class MistPass extends PostProcessingPass {
 		g.setTexture(positionMapTU, uniforms[0]);
 		g.setMatrix(invVPCL, uniforms[1]);
 		g.setVector3(cameraPosCL, uniforms[2]);
-		g.setFloat2(mistScaleCL, uniforms[4], uniforms[5]);
-		g.setFloat4(mistColorCL, uniforms[6], uniforms[7], uniforms[8], uniforms[9]);
+		g.setFloat2(mistScaleCL, uniforms[3], uniforms[4]);
+		g.setFloat4(mistColorCL, uniforms[5], uniforms[6], uniforms[7], uniforms[8]);
 	}
 }

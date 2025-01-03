@@ -28,12 +28,12 @@ vec3 dof(sampler2D tex, vec2 uv, float size) {
 
 void main() {
     vec3 position = texture(positionMap, fragCoord).rgb;
-    position = normalize(invVP * vec4(position * 2.0 - 1.0, 1.0)).xyz;
-    float cameraDist = 1.0 - abs(position.z - cameraPos.z);
+    vec4 worldPos = invVP * vec4(position * 2.0 - 1.0, 1.0);
+    position = worldPos.xyz / worldPos.w;
+    float cameraDist = abs(-position.z - cameraPos.z - focusDistance);
 
     // dof
-    float dofF = abs(cameraDist - focusDistance);
-    vec3 color = dof(textureMap, fragCoord, dofF * blurSize);
+    vec3 color = dof(textureMap, fragCoord, cameraDist * blurSize);
 
     fragColor = vec4(color, 1.0);
 }
