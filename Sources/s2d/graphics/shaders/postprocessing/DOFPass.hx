@@ -1,5 +1,6 @@
 package s2d.graphics.shaders.postprocessing;
 
+#if S2D_PP_DOF
 import kha.graphics4.Graphics;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
@@ -28,3 +29,4 @@ class DOFPass extends PostProcessingPass {
 		g.setFloat(blurSizeCL, uniforms[4]);
 	}
 }
+#end

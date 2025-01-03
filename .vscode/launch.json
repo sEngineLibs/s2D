@@ -19,13 +19,6 @@
             "skipFiles": [
                 "<node_internals>/**"
             ]
-        },
-        {
-            "type": "krom",
-            "request": "launch",
-            "name": "Kha: Krom",
-            "preLaunchTask": "Kha: Build for Krom",
-            "internalConsoleOptions": "openOnSessionStart"
         }
     ],
     "compounds": []

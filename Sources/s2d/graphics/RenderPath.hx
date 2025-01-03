@@ -1,8 +1,8 @@
 package s2d.graphics;
 
-import kha.Shaders;
 import kha.Image;
 import kha.Canvas;
+import kha.Shaders;
 // s2d
 import s2d.objects.Sprite;
 import s2d.graphics.shaders.LightingPass;
@@ -36,6 +36,7 @@ class RenderPath {
 	static inline function compile() {
 		geometryPass.compile(Shaders.geometry_pass_frag, Shaders.geometry_pass_vert);
 		lightingPass.compile(Shaders.lighting_pass_frag, Shaders.s2d_2d_vert);
+
 		#if S2D_PP
 		#if S2D_PP_DOF
 		PostProcessing.dofPass.compile(Shaders.dof_pass_frag);
@@ -43,7 +44,7 @@ class RenderPath {
 		#if S2D_PP_MIST
 		PostProcessing.mistPass.compile(Shaders.mist_pass_frag);
 		#end
-		#if S2D_PP_FILTERS
+		#if S2D_PP_FILTER
 		PostProcessing.filterPass.compile(Shaders.filter_pass_frag);
 		#end
 		#if S2D_PP_FISHEYE
@@ -113,7 +114,7 @@ class RenderPath {
 		g4.setTexture(lightingPass.ormMapTU, gbuffer[3]);
 		g4.setTexture(lightingPass.glowMapTU, gbuffer[4]);
 		g4.setTexture(lightingPass.envMapTU, stage.environmentMap);
-		g4.setTextureParameters(lightingPass.envMapTU, Mirror, Mirror, LinearFilter, LinearFilter, LinearMipFilter);
+		g4.setTextureParameters(lightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		g4.setMatrix(lightingPass.invVPCL, VP.inverse());
 		g4.setFloats(lightingPass.lightsDataCL, stage.lightsData);
 		g4.drawIndexedVertices();
@@ -121,8 +122,8 @@ class RenderPath {
 		sourceInd = 5;
 		targetInd = 6;
 
+		// post-processing
 		#if S2D_PP
-		// postprocessing
 		var invVP = VP.inverse();
 
 		#if S2D_PP_MIST
@@ -164,14 +165,15 @@ class RenderPath {
 		PostProcessing.fisheyePass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
 			gbuffer[sourceInd],
 			// uniforms
-			fisheye.position,
+			fisheye.position.x,
+			fisheye.position.y,
 			fisheye.strength
 		]);
 		sourceInd = 6;
 		targetInd = 5;
 		#end
 
-		#if S2D_PP_FILTERS
+		#if S2D_PP_FILTER
 		for (i in 0...PostProcessing.filters.length) {
 			sourceInd = 5 + (i + 1) % 2;
 			targetInd = 5 + i % 2;

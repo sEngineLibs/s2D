@@ -1,5 +1,6 @@
 package s2d.graphics;
 
+#if S2D_PP_COMPOSITOR
 import kha.Color;
 import kha.FastFloat;
 import kha.arrays.Float32Array;
@@ -49,3 +50,4 @@ class Compositor {
 		return value;
 	}
 }
+#end

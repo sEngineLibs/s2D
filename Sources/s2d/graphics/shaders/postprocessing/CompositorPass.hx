@@ -1,5 +1,6 @@
 package s2d.graphics.shaders.postprocessing;
 
+#if S2D_PP_COMPOSITOR
 import kha.graphics4.Graphics;
 import kha.graphics4.ConstantLocation;
 
@@ -15,3 +16,4 @@ class CompositorPass extends PostProcessingPass {
 		g.setFloats(paramsCL, uniforms[0]);
 	}
 }
+#end

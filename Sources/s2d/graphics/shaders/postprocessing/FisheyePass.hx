@@ -1,5 +1,6 @@
 package s2d.graphics.shaders.postprocessing;
 
+#if S2D_PP_FISHEYE
 import kha.graphics4.Graphics;
 import kha.graphics4.ConstantLocation;
 
@@ -14,7 +15,8 @@ class FisheyePass extends PostProcessingPass {
 	}
 
 	override inline function setUniforms(g:Graphics, ?uniforms:Array<Dynamic>) {
-		g.setVector2(positionCL, uniforms[0]);
-		g.setFloat(strengthCL, uniforms[1]);
+		g.setFloat2(positionCL, uniforms[0], uniforms[1]);
+		g.setFloat(strengthCL, uniforms[2]);
 	}
 }
+#end

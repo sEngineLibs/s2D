@@ -1,5 +1,6 @@
 package s2d.graphics.shaders.postprocessing;
 
+#if S2D_PP_MIST
 import kha.graphics4.Graphics;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.ConstantLocation;
@@ -28,3 +29,4 @@ class MistPass extends PostProcessingPass {
 		g.setFloat4(mistColorCL, uniforms[5], uniforms[6], uniforms[7], uniforms[8]);
 	}
 }
+#end

@@ -1,5 +1,6 @@
 package s2d.graphics.shaders.postprocessing;
 
+#if S2D_PP
 import kha.Image;
 import kha.Canvas;
 import kha.Shaders;
@@ -58,3 +59,4 @@ class PostProcessingPass implements Shader {
 		g2.end();
 	}
 }
+#end
