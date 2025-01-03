@@ -51,7 +51,7 @@ class Stage {
 	}
 
 	inline function set_environmentMap(value:Image):Image {
-		value.generateMipmaps(1);
+		value.generateMipmaps(8);
 		environmentMap = value;
 		return value;
 	}

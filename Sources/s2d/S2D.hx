@@ -2,6 +2,7 @@ package s2d;
 
 import kha.Image;
 import kha.System;
+import kha.Shaders;
 import kha.FastFloat;
 import kha.Framebuffer;
 import kha.math.FastVector3;
@@ -10,18 +11,14 @@ import kha.math.FastMatrix4;
 import s2d.Stage;
 import s2d.objects.Sprite;
 import s2d.graphics.RenderPath;
-import s2d.graphics.Compositor;
 import s2d.graphics.PostProcessing;
 import s2d.graphics.shaders.GeometryPass;
 import s2d.graphics.shaders.LightingPass;
-import s2d.graphics.shaders.CompositorPass;
-import s2d.graphics.shaders.PostProcessingPass;
 
 using s2d.utils.FastMatrix4Ext;
 
 class S2D {
 	public static var projection:FastMatrix4;
-	public static var gbuffer:Array<Image> = [];
 
 	public static var width:Int;
 	public static var height:Int;
@@ -33,8 +30,6 @@ class S2D {
 	@:isVar public static var aspectRatio(default, set):FastFloat = 1.0;
 
 	public static var stage:Stage = new Stage();
-	public static var postProcessing:PostProcessing = new PostProcessing();
-	public static var compositor:Compositor = new Compositor();
 	public static var setup:Void->Void;
 
 	static inline function get_realWidth():Int {
@@ -64,32 +59,16 @@ class S2D {
 	}
 
 	public static inline function ready(w:Int, h:Int) {
-		Sprite.init();
 		realWidth = w;
 		realHeight = h;
-
 		aspectRatio = width / height;
-		// position
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA128, DepthOnly));
-		// normal
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
-		// color
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
-		// [occlusion, roughness, metallness]
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
-		// glow
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, DepthOnly));
-		// post processing
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil));
-		// compositor
-		gbuffer.push(Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil));
+
+		Sprite.init();
+		RenderPath.init(width, height);
 	}
 
 	public static inline function set() {
-		GeometryPass.compile();
-		LightingPass.compile();
-		CompositorPass.compile();
-		PostProcessingPass.compile();
+		RenderPath.compile();
 		setup();
 	}
 
@@ -100,22 +79,8 @@ class S2D {
 	public static inline function resize(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
-
 		aspectRatio = width / height;
-		// position
-		gbuffer[0] = Image.createRenderTarget(width, height, RGBA128, DepthOnly);
-		// normal
-		gbuffer[1] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
-		// color
-		gbuffer[2] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
-		// [occlusion, roughness, metallness]
-		gbuffer[3] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
-		// glow
-		gbuffer[4] = Image.createRenderTarget(width, height, RGBA32, DepthOnly);
-		// post processing
-		gbuffer[5] = Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil);
-		// compositor
-		gbuffer[6] = Image.createRenderTarget(width, height, RGBA32, NoDepthAndStencil);
+		RenderPath.resize(width, height);
 	}
 
 	static inline function set_scale(value:FastFloat):FastFloat {

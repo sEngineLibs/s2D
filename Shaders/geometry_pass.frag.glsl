@@ -52,6 +52,7 @@ void main() {
     normal.z = sqrt(max(0.5, 1.0 - normal.x * normal.x - normal.y * normal.y));
     normal = normal * 0.5 + 0.5;
 
+    // color.a = step(0.5, color.a);
     // premultiply alpha
     normal.rgb *= color.a;
     normal.a = color.a;

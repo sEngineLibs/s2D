@@ -127,7 +127,7 @@ void main() {
     vec3 glow = texture(glowMap, fragCoord).rgb;
 
     float occlusion = orm.r;
-    float roughness = orm.g;
+    float roughness = clamp(0.05, 1.0, orm.g);
     float metalness = orm.b;
 
     // convert data

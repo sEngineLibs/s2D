@@ -1,35 +1,46 @@
 package s2d.graphics.shaders;
 
-import kha.Shaders;
+import kha.Canvas;
+import kha.graphics4.Graphics;
+import kha.graphics4.IndexBuffer;
+import kha.graphics4.VertexBuffer;
+import kha.graphics4.VertexShader;
+import kha.graphics4.FragmentShader;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
 import kha.graphics4.ConstantLocation;
 
-class GeometryPass {
-	public static var pipeline:PipelineState;
+@:allow(s2d.graphics.RenderPath)
+class GeometryPass implements Shader {
+	var pipeline:PipelineState;
+	var modelCL:ConstantLocation;
+	var viewProjectionCL:ConstantLocation;
+	var colorMapTU:TextureUnit;
+	var normalMapTU:TextureUnit;
+	var ormMapTU:TextureUnit;
+	var glowMapTU:TextureUnit;
+	var paramsCL:ConstantLocation;
 
-	public static var modelCL:ConstantLocation;
-	public static var viewProjectionCL:ConstantLocation;
-	public static var colorMapTU:TextureUnit;
-	public static var normalMapTU:TextureUnit;
-	public static var ormMapTU:TextureUnit;
-	public static var glowMapTU:TextureUnit;
-	public static var paramsCL:ConstantLocation;
+	public inline function new() {}
 
-	public static function compile() {
+	inline function setUniforms(g:Graphics, ?uniforms:Array<Dynamic>) {}
+
+	inline function getUniforms() {}
+
+	inline function compile(frag:FragmentShader, ?vert:VertexShader) {
 		var structure = new VertexStructure();
 		structure.add("vertPos", Float32_3X);
 		structure.add("vertUV", Float32_2X);
 
 		pipeline = new PipelineState();
 		pipeline.inputLayout = [structure];
+		pipeline.vertexShader = vert;
+		pipeline.fragmentShader = frag;
 		pipeline.alphaBlendSource = SourceAlpha;
 		pipeline.alphaBlendDestination = InverseSourceAlpha;
 		pipeline.blendSource = BlendOne;
 		pipeline.blendDestination = InverseSourceAlpha;
-		pipeline.vertexShader = Shaders.geometry_pass_vert;
-		pipeline.fragmentShader = Shaders.geometry_pass_frag;
 		pipeline.compile();
 
 		modelCL = pipeline.getConstantLocation("model");
@@ -40,4 +51,6 @@ class GeometryPass {
 		glowMapTU = pipeline.getTextureUnit("glowMap");
 		paramsCL = pipeline.getConstantLocation("Params");
 	}
+
+	inline function render(target:Canvas, indices:IndexBuffer, vertices:VertexBuffer, ?uniforms:Array<Dynamic>):Void {}
 }
