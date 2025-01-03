@@ -1,5 +1,6 @@
 package s2d.graphics;
 
+#if S2D_PP
 import kha.Color;
 import kha.FastFloat;
 import kha.math.FastVector2;
@@ -13,41 +14,39 @@ import s2d.graphics.shaders.postprocessing.CompositorPass;
 
 @:allow(s2d.graphics.RenderPath)
 class PostProcessing {
+	#if S2D_PP_DOF
 	static var dofPass:DOFPass = new DOFPass();
-	static var mistPass:MistPass = new MistPass();
-	static var filterPass:FilterPass = new FilterPass();
-	static var fisheyePass:FisheyePass = new FisheyePass();
-	static var compositorPass:CompositorPass = new CompositorPass();
-
-	public static var dof:DOF = {
+	@:isVar public static var dof(default, never) = {
 		focusDistance: 0.5,
-		blurSize: 0.01
+		blurSize: 0.0
 	};
-	public static var mist:Mist = {
+	#end
+
+	#if S2D_PP_MIST
+	static var mistPass:MistPass = new MistPass();
+	@:isVar public static var mist(default, never) = {
 		near: 0.0,
 		far: 1.0,
-		color: White
+		color: Color.fromFloats(0.0, 0.0, 0.0, 0.0)
 	};
-	public static var fisheye:Fisheye = {
+	#end
+
+	#if S2D_PP_FILTERS
+	static var filterPass:FilterPass = new FilterPass();
+	@:isVar public static var filters(default, never) = new Array<FastMatrix3>();
+	#end
+
+	#if S2D_PP_FISHEYE
+	static var fisheyePass:FisheyePass = new FisheyePass();
+	@:isVar public static var fisheye(default, never) = {
 		position: {x: 0.5, y: 0.5},
 		strength: 0.0
 	};
-	public static var filters:Array<FastMatrix3> = [];
-	public static var compositor:Compositor = new Compositor();
-}
+	#end
 
-private typedef DOF = {
-	var focusDistance:FastFloat;
-	var blurSize:FastFloat;
+	#if S2D_PP_COMPOSITOR
+	static var compositorPass:CompositorPass = new CompositorPass();
+	@:isVar public static var compositor(default, never) = new Compositor();
+	#end
 }
-
-private typedef Mist = {
-	var near:FastFloat;
-	var far:FastFloat;
-	var color:Color;
-}
-
-private typedef Fisheye = {
-	var position:FastVector2;
-	var strength:FastFloat;
-}
+#end

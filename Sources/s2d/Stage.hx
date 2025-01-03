@@ -22,12 +22,12 @@ class Stage {
 	final lightStructSize:Int = 8;
 	@:isVar var lightsData(get, null):Float32Array;
 
-	inline function get_viewProjection() {
-		return S2D.projection.multmat(camera.finalTransformation);
-	}
-
 	public inline function new() {
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
+	}
+
+	inline function get_viewProjection() {
+		return S2D.projection.multmat(camera.finalTransformation);
 	}
 
 	inline function get_lightsData():Float32Array {
@@ -51,8 +51,8 @@ class Stage {
 	}
 
 	inline function set_environmentMap(value:Image):Image {
-		value.generateMipmaps(8);
 		environmentMap = value;
+		environmentMap.generateMipmaps(8);
 		return value;
 	}
 }

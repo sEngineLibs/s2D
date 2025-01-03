@@ -1,8 +1,6 @@
 package s2d;
 
-import kha.Image;
 import kha.System;
-import kha.Shaders;
 import kha.FastFloat;
 import kha.Framebuffer;
 import kha.math.FastVector3;
@@ -11,9 +9,6 @@ import kha.math.FastMatrix4;
 import s2d.Stage;
 import s2d.objects.Sprite;
 import s2d.graphics.RenderPath;
-import s2d.graphics.PostProcessing;
-import s2d.graphics.shaders.GeometryPass;
-import s2d.graphics.shaders.LightingPass;
 
 using s2d.utils.FastMatrix4Ext;
 

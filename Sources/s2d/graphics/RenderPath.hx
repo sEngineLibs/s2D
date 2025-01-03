@@ -36,11 +36,23 @@ class RenderPath {
 	static inline function compile() {
 		geometryPass.compile(Shaders.geometry_pass_frag, Shaders.geometry_pass_vert);
 		lightingPass.compile(Shaders.lighting_pass_frag, Shaders.s2d_2d_vert);
+		#if S2D_PP
+		#if S2D_PP_DOF
 		PostProcessing.dofPass.compile(Shaders.dof_pass_frag);
+		#end
+		#if S2D_PP_MIST
 		PostProcessing.mistPass.compile(Shaders.mist_pass_frag);
+		#end
+		#if S2D_PP_FILTERS
 		PostProcessing.filterPass.compile(Shaders.filter_pass_frag);
+		#end
+		#if S2D_PP_FISHEYE
 		PostProcessing.fisheyePass.compile(Shaders.fisheye_pass_frag);
+		#end
+		#if S2D_PP_COMPOSITOR
 		PostProcessing.compositorPass.compile(Shaders.compositor_pass_frag);
+		#end
+		#end
 	}
 
 	static inline function resize(width:Int, height:Int) {
@@ -109,9 +121,11 @@ class RenderPath {
 		sourceInd = 5;
 		targetInd = 6;
 
+		#if S2D_PP
 		// postprocessing
 		var invVP = VP.inverse();
 
+		#if S2D_PP_MIST
 		var mist = PostProcessing.mist;
 		PostProcessing.mistPass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
 			gbuffer[sourceInd],
@@ -128,7 +142,9 @@ class RenderPath {
 		]);
 		sourceInd = 6;
 		targetInd = 5;
+		#end
 
+		#if S2D_PP_DOF
 		var dof = PostProcessing.dof;
 		PostProcessing.dofPass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
 			gbuffer[sourceInd],
@@ -141,7 +157,9 @@ class RenderPath {
 		]);
 		sourceInd = 5;
 		targetInd = 6;
+		#end
 
+		#if S2D_PP_FISHEYE
 		var fisheye = PostProcessing.fisheye;
 		PostProcessing.fisheyePass.render(gbuffer[targetInd], Sprite.indices, Sprite.vertices, [
 			gbuffer[sourceInd],
@@ -151,7 +169,9 @@ class RenderPath {
 		]);
 		sourceInd = 6;
 		targetInd = 5;
+		#end
 
+		#if S2D_PP_FILTERS
 		for (i in 0...PostProcessing.filters.length) {
 			sourceInd = 5 + (i + 1) % 2;
 			targetInd = 5 + i % 2;
@@ -161,7 +181,9 @@ class RenderPath {
 				PostProcessing.filters[i]
 			]);
 		}
+		#end
 
+		#if S2D_PP_COMPOSITOR
 		var compositor = PostProcessing.compositor;
 		g2 = gbuffer[sourceInd].g2;
 		g2.scissor(0, compositor.letterBoxHeight, target.width, target.height - compositor.letterBoxHeight * 2);
@@ -171,6 +193,8 @@ class RenderPath {
 			compositor.params
 		]);
 		g2.disableScissor();
+		#end
+		#end
 
 		g2 = target.g2;
 		g2.begin();
