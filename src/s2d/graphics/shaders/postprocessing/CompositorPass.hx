@@ -6,7 +6,7 @@ import kha.graphics4.ConstantLocation;
 
 @:allow(s2d.graphics.RenderPath)
 class CompositorPass extends PostProcessingPass {
-	public static var paramsCL:ConstantLocation;
+	var paramsCL:ConstantLocation;
 
 	override inline function getUniforms() {
 		paramsCL = pipeline.getConstantLocation("Params");

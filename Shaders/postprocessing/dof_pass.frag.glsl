@@ -7,10 +7,10 @@ precision mediump float;
 #define gamma vec3(5.2)
 #define invGamma (1.0 / gamma)
 
-#if defined(S2D_PP_DOF_QUALITY_LEVEL)
-#if S2D_PP_DOF_QUALITY_LEVEL == 0
+#if defined(S2D_PP_DOF_QUALITY)
+#if S2D_PP_DOF_QUALITY == 0
 #define quality 4.0
-#elif S2D_PP_DOF_QUALITY_LEVEL == 1
+#elif S2D_PP_DOF_QUALITY == 1
 #define quality 8.0
 #else
 #define quality 16.0
