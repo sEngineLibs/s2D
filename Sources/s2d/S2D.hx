@@ -1,5 +1,6 @@
 package s2d;
 
+import kha.Canvas;
 import kha.System;
 import kha.FastFloat;
 import kha.Framebuffer;
@@ -25,7 +26,6 @@ class S2D {
 	@:isVar public static var aspectRatio(default, set):FastFloat = 1.0;
 
 	public static var stage:Stage = new Stage();
-	public static var setup:Void->Void;
 
 	static inline function get_realWidth():Int {
 		return Std.int(width / resolutionScale);
@@ -53,23 +53,17 @@ class S2D {
 		return value;
 	}
 
-	public static inline function ready(w:Int, h:Int) {
+	public static inline function init(w:Int, h:Int) {
 		realWidth = w;
 		realHeight = h;
 		aspectRatio = width / height;
 
 		Sprite.init();
 		RenderPath.init(width, height);
-	}
-
-	public static inline function set() {
 		RenderPath.compile();
-		setup();
 	}
 
-	public static inline function go() {
-		System.notifyOnFrames(render);
-	}
+	public static inline function update() {}
 
 	public static inline function resize(w:Int, h:Int) {
 		realWidth = w;
@@ -151,7 +145,7 @@ class S2D {
 		return local2ScreenSpace(world2LocalSpace(point));
 	}
 
-	public static inline function render(frames:Array<Framebuffer>):Void {
-		RenderPath.render(frames[0], stage);
+	public static inline function render(target:Canvas):Void {
+		RenderPath.render(target, stage);
 	}
 }

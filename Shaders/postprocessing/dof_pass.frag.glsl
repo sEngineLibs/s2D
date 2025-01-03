@@ -4,8 +4,20 @@
 precision mediump float;
 #endif
 
-#define dofQuality 6
-#define dofWeight (dofQuality * dofQuality * 2.0)
+#define gamma vec3(5.2)
+#define invGamma (1.0 / gamma)
+
+#if defined(S2D_PP_DOF_QUALITY_LEVEL)
+#if S2D_PP_DOF_QUALITY_LEVEL == 0
+#define quality 4.0
+#elif S2D_PP_DOF_QUALITY_LEVEL == 1
+#define quality 8.0
+#else
+#define quality 16.0
+#endif
+#else
+#define quality 4.0
+#endif
 
 uniform sampler2D textureMap;
 uniform vec2 resolution;
@@ -18,12 +30,22 @@ uniform float blurSize;
 in vec2 fragCoord;
 out vec4 fragColor;
 
-vec3 dof(sampler2D tex, vec2 uv, float size) {
+vec3 blur(sampler2D tex, vec2 uv, float size, float ratio) {
     vec3 col = vec3(0.0);
-    for (float y = -1.0; y <= 1.0; y += 1.0 / dofQuality)
-        for (float x = -1.0; x <= 1.0; x += 1.0 / dofQuality)
-            col += texture(tex, uv + vec2(x, y) * size).rgb;
-    return col / dofWeight;
+    float W = 0.0;
+
+    for (float y = -1.0; y <= 1.0; y += 1.0 / quality) {
+        for (float x = -1.0; x <= 1.0; x += 1.0 / quality) {
+            vec2 p = vec2(x, y);
+            vec2 offset = p * size * vec2(1.0, ratio);
+
+            float w = 1.0 - smoothstep(0.0, 1.0, length(p));
+            col += pow(texture(tex, uv + offset).rgb, gamma) * w;
+            W += w;
+        }
+    }
+
+    return pow(col / W, invGamma);
 }
 
 void main() {
@@ -33,7 +55,7 @@ void main() {
     float cameraDist = abs(-position.z - cameraPos.z - focusDistance);
 
     // dof
-    vec3 color = dof(textureMap, fragCoord, cameraDist * blurSize);
+    vec3 color = blur(textureMap, fragCoord, cameraDist * blurSize, resolution.x / resolution.y);
 
     fragColor = vec4(color, 1.0);
 }
