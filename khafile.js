@@ -1,7 +1,7 @@
 let project = new Project("New Project");
-project.addAssets("Assets/**");
-project.addShaders("Shaders/**");
-project.addSources("Sources");
+project.addAssets("assets/**");
+project.addShaders("shaders/**");
+project.addSources("src");
 
 // Available Compiler Flags:
 // S2D_PP -> enables Post-Processing
