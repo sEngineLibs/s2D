@@ -43,7 +43,7 @@ void main() {
 
     // convert data
     position = vec4(fragPos, 1.0);
-    position.z += normal.z * depthScale / scaleZ;
+    position.z += (normal.z * 2.0 - 1.0) * depthScale / scaleZ;
 
     // tangent space -> world space
     vec2 n = normal.xy * 2.0 - 1.0;

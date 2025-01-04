@@ -15,7 +15,7 @@ class Material {
 
 	public inline function new() {
 		params = new Float32Array(1);
-		depthScale = 0.0;
+		depthScale = 1.0;
 	}
 
 	inline function get_depthScale():FastFloat {
