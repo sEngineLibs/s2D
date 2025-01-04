@@ -25,7 +25,7 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
 
     // radiance
     vec3 reflection = normalize(reflect(-V, normal));
-    float mipLevel = roughness * 8.0;
+    float mipLevel = roughness * 10.0;
     vec3 radiance = textureLod(envMap, reflection.xy * 0.5 + 0.5, mipLevel).rgb;
 
     // Fresnel
@@ -35,7 +35,7 @@ vec3 envLighting(vec3 normal, vec3 color, float roughness, float metalness) {
     vec3 specular = radiance * F;
 
     // irradiance
-    vec3 diffuseIrradiance = textureLod(envMap, normal.xy * 0.5 + 0.5, 8.0).rgb;
+    vec3 diffuseIrradiance = textureLod(envMap, normal.xy * 0.5 + 0.5, 10.0).rgb;
     vec3 kD = (1.0 - F) * (1.0 - metalness);
     vec3 diffuse = kD * color * diffuseIrradiance;
 
