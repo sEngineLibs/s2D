@@ -1,5 +1,6 @@
 package s2d.graphics.shaders;
 
+#if S2D_RP_ENV_LIGHTING
 import kha.Canvas;
 import kha.graphics4.Graphics;
 import kha.graphics4.IndexBuffer;
@@ -9,18 +10,16 @@ import kha.graphics4.FragmentShader;
 import kha.graphics4.TextureUnit;
 import kha.graphics4.PipelineState;
 import kha.graphics4.VertexStructure;
-import kha.graphics4.ConstantLocation;
 
 @:allow(s2d.graphics.RenderPath)
-class LightingPass implements Shader {
+class EnvLightingPass implements Shader {
 	var pipeline:PipelineState;
 
-	var positionMapTU:TextureUnit;
 	var colorMapTU:TextureUnit;
 	var normalMapTU:TextureUnit;
+	var glowMapTU:TextureUnit;
 	var ormMapTU:TextureUnit;
-	var invVPCL:ConstantLocation;
-	var lightsDataCL:ConstantLocation;
+	var envMapTU:TextureUnit;
 
 	public inline function new() {}
 
@@ -41,13 +40,13 @@ class LightingPass implements Shader {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
-		positionMapTU = pipeline.getTextureUnit("positionMap");
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
+		glowMapTU = pipeline.getTextureUnit("glowMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
-		invVPCL = pipeline.getConstantLocation("invVP");
-		lightsDataCL = pipeline.getConstantLocation("lightsData");
+		envMapTU = pipeline.getTextureUnit("envMap");
 	}
 
 	inline function render(target:Canvas, indices:IndexBuffer, vertices:VertexBuffer, ?uniforms:Array<Dynamic>):Void {}
 }
+#end

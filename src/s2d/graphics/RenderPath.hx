@@ -7,12 +7,18 @@ import kha.Shaders;
 import s2d.objects.Sprite;
 import s2d.graphics.shaders.LightingPass;
 import s2d.graphics.shaders.GeometryPass;
+#if S2D_RP_ENV_LIGHTING
+import s2d.graphics.shaders.EnvLightingPass;
+#end
 
 using s2d.utils.FastMatrix4Ext;
 
 @:allow(s2d.S2D)
 class RenderPath {
 	static var geometryPass:GeometryPass = new GeometryPass();
+	#if S2D_RP_ENV_LIGHTING
+	static var envLightingPass:EnvLightingPass = new EnvLightingPass();
+	#end
 	static var lightingPass:LightingPass = new LightingPass();
 	static var gbuffer:Array<Image> = [];
 
@@ -36,6 +42,9 @@ class RenderPath {
 	static inline function compile() {
 		geometryPass.compile(Shaders.geometry_pass_frag, Shaders.geometry_pass_vert);
 		lightingPass.compile(Shaders.lighting_pass_frag, Shaders.s2d_2d_vert);
+		#if S2D_RP_ENV_LIGHTING
+		envLightingPass.compile(Shaders.env_lighting_pass_frag, Shaders.s2d_2d_vert);
+		#end
 
 		#if S2D_PP
 		#if S2D_PP_DOF
@@ -101,10 +110,24 @@ class RenderPath {
 		sourceInd = 0;
 		targetInd = 5;
 
-		// lighting pass
+		// Lighting Pass
+		// environment + glow pass
 		g2 = gbuffer[targetInd].g2;
 		g4 = gbuffer[targetInd].g4;
 		g2.begin();
+		#if S2D_RP_ENV_LIGHTING
+		g4.setPipeline(envLightingPass.pipeline);
+		g4.setIndexBuffer(Sprite.indices);
+		g4.setVertexBuffer(Sprite.vertices);
+		g4.setTexture(envLightingPass.normalMapTU, gbuffer[1]);
+		g4.setTexture(envLightingPass.colorMapTU, gbuffer[2]);
+		g4.setTexture(envLightingPass.ormMapTU, gbuffer[3]);
+		g4.setTexture(envLightingPass.glowMapTU, gbuffer[4]);
+		g4.setTexture(envLightingPass.envMapTU, stage.environmentMap);
+		g4.setTextureParameters(envLightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
+		g4.drawIndexedVertices();
+		#end
+		// stage lights
 		g4.setPipeline(lightingPass.pipeline);
 		g4.setIndexBuffer(Sprite.indices);
 		g4.setVertexBuffer(Sprite.vertices);
@@ -112,9 +135,6 @@ class RenderPath {
 		g4.setTexture(lightingPass.normalMapTU, gbuffer[1]);
 		g4.setTexture(lightingPass.colorMapTU, gbuffer[2]);
 		g4.setTexture(lightingPass.ormMapTU, gbuffer[3]);
-		g4.setTexture(lightingPass.glowMapTU, gbuffer[4]);
-		g4.setTexture(lightingPass.envMapTU, stage.environmentMap);
-		g4.setTextureParameters(lightingPass.envMapTU, Clamp, Clamp, LinearFilter, LinearFilter, LinearMipFilter);
 		g4.setMatrix(lightingPass.invVPCL, VP.inverse());
 		g4.setFloats(lightingPass.lightsDataCL, stage.lightsData);
 		g4.drawIndexedVertices();

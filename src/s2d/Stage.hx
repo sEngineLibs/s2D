@@ -15,20 +15,21 @@ class Stage {
 	public var sprites:Array<Sprite> = [];
 	public var lights:Array<Light> = [];
 	public var camera:Object = new Object();
-	public var viewProjection(get, null):FastMatrix4;
-	@:isVar public var environmentMap(default, set):Image;
 
 	final maxLights:Int = 16;
 	final lightStructSize:Int = 8;
-	@:isVar var lightsData(get, null):Float32Array;
 
 	public inline function new() {
 		lightsData = new Float32Array(1 * maxLights * lightStructSize);
 	}
 
+	public var viewProjection(get, null):FastMatrix4;
+
 	inline function get_viewProjection() {
 		return S2D.projection.multmat(camera.finalTransformation);
 	}
+
+	@:isVar var lightsData(get, null):Float32Array;
 
 	inline function get_lightsData():Float32Array {
 		lightsData[0] = lights.length;
@@ -50,9 +51,13 @@ class Stage {
 		return lightsData;
 	}
 
+	#if S2D_RP_ENV_LIGHTING
+	@:isVar public var environmentMap(default, set):Image;
+
 	inline function set_environmentMap(value:Image):Image {
 		environmentMap = value;
 		environmentMap.generateMipmaps(4);
 		return value;
 	}
+	#end
 }
