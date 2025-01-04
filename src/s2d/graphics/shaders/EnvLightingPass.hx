@@ -1,6 +1,5 @@
 package s2d.graphics.shaders;
 
-#if S2D_RP_ENV_LIGHTING
 import kha.Canvas;
 import kha.graphics4.Graphics;
 import kha.graphics4.IndexBuffer;
@@ -15,11 +14,13 @@ import kha.graphics4.VertexStructure;
 class EnvLightingPass implements Shader {
 	var pipeline:PipelineState;
 
+	var glowMapTU:TextureUnit;
+	#if S2D_RP_ENV_LIGHTING
 	var colorMapTU:TextureUnit;
 	var normalMapTU:TextureUnit;
-	var glowMapTU:TextureUnit;
 	var ormMapTU:TextureUnit;
 	var envMapTU:TextureUnit;
+	#end
 
 	public inline function new() {}
 
@@ -40,13 +41,14 @@ class EnvLightingPass implements Shader {
 		pipeline.blendOperation = Add;
 		pipeline.compile();
 
+		glowMapTU = pipeline.getTextureUnit("glowMap");
+		#if S2D_RP_ENV_LIGHTING
 		colorMapTU = pipeline.getTextureUnit("colorMap");
 		normalMapTU = pipeline.getTextureUnit("normalMap");
-		glowMapTU = pipeline.getTextureUnit("glowMap");
 		ormMapTU = pipeline.getTextureUnit("ormMap");
 		envMapTU = pipeline.getTextureUnit("envMap");
+		#end
 	}
 
 	inline function render(target:Canvas, indices:IndexBuffer, vertices:VertexBuffer, ?uniforms:Array<Dynamic>):Void {}
 }
-#end
